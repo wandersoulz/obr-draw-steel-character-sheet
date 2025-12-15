@@ -1,0 +1,34 @@
+import { AbilityData } from "@/forgesteel/data/ability-data";
+import { ClassicSheetBuilder } from "@/forgesteel/logic/classic-sheet/classic-sheet-builder";
+import { HeroLogic } from "@/forgesteel/logic/hero-logic";
+import { Hero } from "@/forgesteel/models/hero";
+import { Sourcebook } from "@/forgesteel/models/sourcebook";
+import { AbilityCard } from "../ability/AbilityCard";
+
+interface CharacterAbilitiesProps {
+    hero: Hero;
+    sourcebooks: Sourcebook[];
+}
+
+export function CharacterAbilities({ hero, sourcebooks }: CharacterAbilitiesProps) {
+    const heroicResourceName = HeroLogic.getHeroicResources(hero)[0].name;
+    const abilities = HeroLogic.getAbilities(hero, sourcebooks, []).map(a => a.ability);
+
+    const freeStrikes = [ AbilityData.freeStrikeMelee, AbilityData.freeStrikeRanged ]
+        .map(a => ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined));
+    let abilitySheets = abilities.map(a => ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined)).concat(freeStrikes);
+
+    abilitySheets = abilitySheets.filter((ability, index) => {
+        return index === abilitySheets.findIndex((t) => t.id === ability.id)
+    });
+
+    return (
+        <div className="flex flex-col gap-3 flex-1 min-h-0">
+            <div className="bg-slate-700 rounded-lg p-2">
+                <div className="flex gap-3 flex-wrap overflow-hidden">
+                    {abilitySheets.map(ability => <AbilityCard key={ability.id} heroicResourceName={heroicResourceName} ability={ability} />)}
+                </div>
+            </div>
+        </div>
+    )
+}

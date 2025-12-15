@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --accent: #9966ff;
+  --accent-foreground: #f5f2ff;
+  --foreground: var(--color-black);
+  --foreground-inverse: var(--color-white);
+  --foreground-secondary: rgba(0, 0, 0, 0.6);
+  --foreground-secondary: rgba(0, 0, 0, 0.6);
+}
+
+.dark {
+  --accent: #bb99ff;
+  --accent-foreground: #350c69;
+  --foreground: var(--color-white);
+  --foreground-inverse: var(--color-black);
+  --foreground-secondary: rgba(255, 255, 255, 0.7);
+}
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-foreground: var(--foreground);
+  --color-foreground-inverse: var(--foreground-inverse);
+  --color-foreground-secondary: var(--foreground-secondary);
+}
+
+@theme {
+  --color-mirage-50: #f4f5f9;
+  --color-mirage-99: #eaedf5;
+  --color-mirage-100: #e5e9f3;
+  --color-mirage-199: #dde1ee;
+  --color-mirage-200: #dadeed;
+  --color-mirage-300: #c1c8e0;
+  --color-mirage-400: #898fa7;
+  --color-mirage-500: #6a708d;
+  --color-mirage-600: #555974;
+  --color-mirage-700: #464a5e;
+  --color-mirage-800: #3d4051;
+  --color-mirage-900: #333648;
+  --color-mirage-901: #2d3143;
+  --color-mirage-950: #222639;
+
+  --breakpoint-sm: 24rem;
+  --breakpoint-md: 32rem;
+  --breakpoint-lg: 40rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+html,
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+:root {
+  line-height: 1.5;
+  font-weight: 400;
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  width: 0;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: 0;  /* Firefox */
+}

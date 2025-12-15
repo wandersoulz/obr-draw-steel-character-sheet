@@ -1,0 +1,48 @@
+import { cn } from "@/utils/className";
+import SmartNumericInput from "./SmartNumericInput";
+import InputBackground from "./InputBackground";
+import { Minus, Plus } from "lucide-react";
+
+interface CounterTrackerProps {
+    parentValue: number;
+    color?: string;
+    updateHandler: (target: HTMLInputElement) => void;
+    incrementHandler: () => void;
+    decrementHandler: () => void;
+    label: string;
+}
+
+export default function CounterTracker({
+    parentValue,
+    color = "DEFAULT",
+    updateHandler,
+    incrementHandler,
+    decrementHandler,
+    label,
+}: CounterTrackerProps) {
+    return (
+        <div className="flex flex-col justify-between flex-grow">
+            <label className="text-xs text-slate-400 capitalize mb-1 text-center">{label}</label>
+            <InputBackground color={color}>
+                <button 
+                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-700 transition-colors text-slate-300"
+                    onClick={decrementHandler}
+                >
+                    <Minus size={14} strokeWidth={3.0} />
+                </button>
+                <SmartNumericInput
+                    value={parentValue.toString()}
+                    onUpdate={updateHandler}
+                    clearContentOnFocus
+                    className={cn("flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none")}
+                />
+                <button 
+                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-700 transition-colors text-slate-300"
+                    onClick={incrementHandler}
+                >
+                    <Plus size={14} strokeWidth={3.0} />
+                </button>
+            </InputBackground>
+        </div>
+    )
+}
