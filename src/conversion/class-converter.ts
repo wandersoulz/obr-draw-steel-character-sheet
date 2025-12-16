@@ -1,9 +1,9 @@
-import { HeroClass } from "@/forgesteel/models/class";
-import { ClassLite } from "../models/class-lite";
-import { Feature, FeatureChoice, FeatureClassAbility, FeatureKit, FeaturePerk, FeatureSkillChoice } from "@/forgesteel/models/feature";
-import { FeatureType } from "@/forgesteel/enums/feature-type";
-import { SourcebookLogic } from "@/forgesteel/logic/sourcebook-logic";
-import { ClassData } from "@/forgesteel/data/class-data";
+import { HeroClass } from 'forgesteel';
+import { ClassLite } from '../models/class-lite';
+import { Feature, FeatureChoice, FeatureClassAbility, FeatureKit, FeaturePerk, FeatureSkillChoice } from 'forgesteel';
+import { FeatureType } from 'forgesteel';
+import { SourcebookLogic } from 'forgesteel';
+import { ClassData } from 'forgesteel';
 
 export class ClassConverter {
 
@@ -88,8 +88,9 @@ export class ClassConverter {
         return lite;
     }
 
-    static toClass(classLite: ClassLite): HeroClass {
-        const sourcebooks = SourcebookLogic.getSourcebooks();
+    static async toClass(classLite: ClassLite): Promise<HeroClass> {
+        const allSourcebookIds = Object.keys(SourcebookLogic.registry);
+        const sourcebooks = await SourcebookLogic.getSourcebooks(allSourcebookIds);
 
         const rootClass = Object.values(ClassData).find(c => (c as HeroClass).id === classLite.classId) as HeroClass;
 

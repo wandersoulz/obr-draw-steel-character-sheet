@@ -1,8 +1,8 @@
-import { AncestryLite } from "@/models/ancestry-lite";
-import { AncestryData } from "@/forgesteel/data/ancestry-data";
-import { FeatureType } from "@/forgesteel/enums/feature-type";
-import { Ancestry } from "@/forgesteel/models/ancestry";
-import { Feature, FeatureChoice, FeatureMultiple, FeatureSkillChoice } from "@/forgesteel/models/feature";
+import { AncestryLite } from '@/models/ancestry-lite';
+import { AncestryData } from 'forgesteel';
+import { FeatureType } from 'forgesteel';
+import { Ancestry } from 'forgesteel';
+import { Feature, FeatureChoice, FeatureMultiple, FeatureSkillChoice } from 'forgesteel';
 
 export class AncestryConverter {
     static ancestryCache: Record<string, Feature[]> = {};

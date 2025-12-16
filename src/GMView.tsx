@@ -1,12 +1,11 @@
 import OBR from "@owlbear-rodeo/sdk";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Player } from "@owlbear-rodeo/sdk";
 import { usePlayerCharacters } from "./hooks/usePlayerCharacters";
 import { Link } from "react-router-dom";
 import { useParty } from "./hooks/useParty";
 import { usePartyStore } from "./stores/partyStore";
 import PlayerCharacterList from "./components/PlayerCharacterList";
-import { HeroLite } from "./models/hero-lite";
 import { useAutoResizer } from "./hooks/useAutoResizer";
 
 interface GMViewProps {
@@ -19,6 +18,22 @@ export default function GMView({role, playerId}: GMViewProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [assigningCharacterId, setAssigningCharacterId] = useState<string | null>(null);
   const containerRef = useAutoResizer();
+  const [heroSubtitles, setHeroSubtitles] = useState<Record<string, string>>();
+
+  useEffect(() => {
+    const allCharactersPromise = characters.map(character => {
+      const ancestryPromise = character.getAncestry();
+      const heroClassPromise = character.getClass();
+      return Promise.all([ancestryPromise, heroClassPromise, Promise.resolve(character.id)]);
+    });
+
+    Promise.all(allCharactersPromise).then((characterResponses) => {
+      const allSubtitles = characterResponses
+        .map(([ancestry, heroClass, characterId]) => { return {[characterId]: `${ancestry.name} ${heroClass.name}`}})
+        .reduce((oldValues, newValues) => Object.assign(oldValues, newValues));
+      setHeroSubtitles(allSubtitles);
+    });
+  }, []);
 
   useParty();
 
@@ -40,12 +55,6 @@ export default function GMView({role, playerId}: GMViewProps) {
     setAssigningCharacterId(null);
   }
 
-  const getCharacterSubtitle = (character: HeroLite): String => {
-    const ancestry= character.getAncestry();
-    const heroClass = character.getClass();
-    return `${ancestry.name} ${heroClass.name}`;
-  }
-
   return (
     <div ref={containerRef} className="text-center bg-mirage-50/75 dark:bg-mirage-950/50 flex flex-col p-2 overflow-y-auto">
       <h2 className="text-lg font-bold mb-2">GM View</h2>
@@ -58,7 +67,7 @@ export default function GMView({role, playerId}: GMViewProps) {
                 <div className="flex-grow truncate">
                   <Link to={`/character/${character.id}`}>
                     <p className="text-sm font-bold truncate">{character.name}</p>
-                    <p className="text-xs text-mirage-500 truncate">{getCharacterSubtitle(character)}</p>
+                    <p className="text-xs text-mirage-500 truncate">{heroSubtitles && heroSubtitles[character.id]}</p>
                   </Link>
                 </div>
                 <div className="relative ml-2 flex-shrink-0">

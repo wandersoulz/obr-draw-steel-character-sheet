@@ -1,16 +1,18 @@
-import { Hero } from "@/forgesteel/models/hero";
-import { HeroLogic } from "@/forgesteel/logic/hero-logic";
-import { Sourcebook } from "@/forgesteel/models/sourcebook";
-import { Feature } from "@/forgesteel/models/feature";
+import { Hero } from 'forgesteel';
+import { HeroLogic } from 'forgesteel';
+import { Sourcebook } from 'forgesteel';
+import { Feature } from 'forgesteel';
 import { Markdown } from "./controls/markdown/markdown";
-import { FeatureLogic } from "@/forgesteel/logic/feature-logic";
+import { FeatureLogic } from 'forgesteel';
 
 interface AncestryViewProps {
-    hero: Hero;
+    hero?: Hero;
     sourcebooks: Sourcebook[];
 }
 
 export default function AncestryView({ hero, sourcebooks }: AncestryViewProps) {
+    if (!hero) return <div></div>;
+    
     const languages = HeroLogic.getLanguages(hero, sourcebooks);
     const features = FeatureLogic.getFeaturesFromAncestry(hero.ancestry!, hero);
 

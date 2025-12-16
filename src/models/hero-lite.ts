@@ -1,16 +1,16 @@
-import { AbilityCustomization, Hero } from "@/forgesteel/models/hero";
-import { HeroState } from "@/forgesteel/models/hero-state";
-import { AncestryLite } from "./ancestry-lite";
-import { AncestryConverter } from "@/conversion/ancestry-converter";
-import { CultureConverter } from "@/conversion/culture-converter";
-import { CultureLite } from "./culture-lite";
-import { CareerLite } from "./career-lite";
-import { CareerConverter } from "@/conversion/career-converter";
-import { ClassLite } from "./class-lite";
-import { ClassConverter } from "@/conversion/class-converter";
-import { ComplicationLite } from "./complication-lite";
-import { ComplicationConverter } from "@/conversion/complication-converter";
-import { Feature } from "@/forgesteel/models/feature";
+import { AbilityCustomization, Hero } from 'forgesteel';
+import { HeroState } from 'forgesteel';
+import { AncestryLite } from './ancestry-lite';
+import { AncestryConverter } from '@/conversion/ancestry-converter';
+import { CultureConverter } from '@/conversion/culture-converter';
+import { CultureLite } from './culture-lite';
+import { CareerLite } from './career-lite';
+import { CareerConverter } from '@/conversion/career-converter';
+import { ClassLite } from './class-lite';
+import { ClassConverter } from '@/conversion/class-converter';
+import { ComplicationLite } from './complication-lite';
+import { ComplicationConverter } from '@/conversion/complication-converter';
+import { Feature } from 'forgesteel';
 
 export class HeroLite {
     id: string;
@@ -114,19 +114,19 @@ export class HeroLite {
         );
     }
 
-    toHero(): Hero {
+    async toHero(): Promise<Hero> {
         const hero: Hero = {
             id: this.id,
             name: this.name,
             ancestry: this.getAncestry(),
-            career: CareerConverter.toCareer(this.career),
-            culture: CultureConverter.toCulture(this.culture),
-            class: ClassConverter.toClass(this.class),
-            complication: this.complication ? ComplicationConverter.toComplication(this.complication) : null,
+            career: await CareerConverter.toCareer(this.career),
+            culture: await CultureConverter.toCulture(this.culture),
+            class: await ClassConverter.toClass(this.class),
+            complication: this.complication ? await ComplicationConverter.toComplication(this.complication) : null,
             features: this.features,
             state: this.state,
             picture: null,
-            folder: "",
+            folder: '',
             settingIDs: [],
             abilityCustomizations: []
         };

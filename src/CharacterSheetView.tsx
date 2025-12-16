@@ -2,11 +2,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { usePlayerCharacters } from "./hooks/usePlayerCharacters";
 import CharacterStats from "./components/character-stats/CharacterStats";
 import { HeroLite } from "./models/hero-lite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CharacterAbilities } from "./components/abilities/character-abilities";
-import { SourcebookLogic } from "./forgesteel/logic/sourcebook-logic";
+import { Sourcebook, SourcebookLogic } from "forgesteel";
 import { ArrowLeft } from 'lucide-react';
-import { Hero } from "./forgesteel/models/hero";
+import { Hero } from "forgesteel";
 import { useAutoResizer } from "./hooks/useAutoResizer";
 import AncestryView from "./components/AncestryView";
 import { StandardAbilities } from "./components/abilities/standard-abilities";
@@ -19,11 +19,20 @@ interface CharacterSheetViewProps {
 export default function CharacterSheetView({ playerId, role }: CharacterSheetViewProps) {
     const [activeTab, setActiveTab] = useState('stats');
     const { characterId } = useParams<{ characterId: string }>();
+    const [fullHero, setHero] = useState<Hero>();
     const navigate = useNavigate();
     const containerRef = useAutoResizer();
 
+    const [sourcebooks, setSourcebooks] = useState<Sourcebook[]>([]);
+
     const { characters, updateCharacter } = usePlayerCharacters(playerId, role);
     const character = characters.find(c => c.id === characterId);
+
+    useEffect(() => {
+        const allIds = Object.keys(SourcebookLogic.registry);
+        SourcebookLogic.getSourcebooks(allIds).then(setSourcebooks);
+        character?.toHero().then(setHero);
+    }, [])
 
     const onUpdate = (partialCharacter: Partial<HeroLite>) => {
         if (character) {
@@ -41,10 +50,8 @@ export default function CharacterSheetView({ playerId, role }: CharacterSheetVie
 
     const isOwner = character.playerId === playerId;
 
-    const fullHero: Hero = character.toHero();
-
-    const level = fullHero.class?.level || 1;
-    const ancestry = fullHero.ancestry?.name;
+    const level = fullHero?.class?.level || 1;
+    const ancestry = fullHero?.ancestry?.name;
     return (
         <div ref={containerRef} className="no-scrollbar bg-slate-900 text-slate-100 flex items-center justify-center">
             <div className="w-full bg-slate-800 rounded-lg shadow-xl flex flex-col">
@@ -84,10 +91,10 @@ export default function CharacterSheetView({ playerId, role }: CharacterSheetVie
                     ))}
                 </div>
                 <div className="flex flex-1 p-2 min-w-130 no-scrollbar">
-                    {activeTab == "stats" && <CharacterStats character={character} isGM={role === "GM"} isOwner={isOwner} onUpdate={onUpdate} />}
-                    {activeTab == "character abilities" && <CharacterAbilities hero={character.toHero()} sourcebooks={SourcebookLogic.getSourcebooks()} />}
-                    {activeTab == "standard abilities" && <StandardAbilities hero={character.toHero()} />}
-                    {activeTab == "ancestries" && <AncestryView hero={character.toHero()} sourcebooks={SourcebookLogic.getSourcebooks()} />}
+                    {activeTab == "stats" && <CharacterStats hero={fullHero} sourcebooks={sourcebooks} isGM={role === "GM"} isOwner={isOwner} onUpdate={onUpdate} />}
+                    {activeTab == "character abilities" && <CharacterAbilities hero={fullHero} sourcebooks={sourcebooks} />}
+                    {activeTab == "standard abilities" && <StandardAbilities hero={fullHero} />}
+                    {activeTab == "ancestries" && <AncestryView hero={fullHero} sourcebooks={sourcebooks} />}
                 </div>
             </div>
         </div>

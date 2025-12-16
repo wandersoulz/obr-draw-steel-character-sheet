@@ -1,4 +1,4 @@
-import { Characteristic } from "@/forgesteel/enums/characteristic";
+import { Characteristic } from 'forgesteel';
 
 interface CharacteristicProps {
     characteristic: Characteristic;

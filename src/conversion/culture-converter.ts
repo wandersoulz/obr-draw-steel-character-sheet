@@ -1,9 +1,9 @@
-import { Culture } from "@/forgesteel/models/culture";
-import { CultureLite } from "../models/culture-lite";
-import { FeatureSkillChoice, FeatureLanguageChoice } from "@/forgesteel/models/feature";
-import { SourcebookLogic } from "@/forgesteel/logic/sourcebook-logic";
-import { CultureData, EnvironmentData, OrganizationData, UpbringingData } from "@/forgesteel/data/culture-data";
-import { AncestryData } from "@/forgesteel/data/ancestry-data";
+import { Culture } from 'forgesteel';
+import { CultureLite } from '../models/culture-lite';
+import { FeatureSkillChoice, FeatureLanguageChoice } from 'forgesteel';
+import { SourcebookLogic } from 'forgesteel';
+import { CultureData, EnvironmentData, OrganizationData, UpbringingData } from 'forgesteel';
+import { AncestryData } from 'forgesteel';
 
 export class CultureConverter {
     static fromCulture(culture: Culture): CultureLite {
@@ -16,8 +16,9 @@ export class CultureConverter {
         }
     }
 
-    static toCulture(cultureLite: CultureLite): Culture {
-        const sourcebooks = SourcebookLogic.getSourcebooks();
+    static async toCulture(cultureLite: CultureLite): Promise<Culture> {
+        const allSourcebookIds = Object.keys(SourcebookLogic.registry)
+        const sourcebooks = await SourcebookLogic.getSourcebooks(allSourcebookIds);
 
         const allCultures = [
             ...SourcebookLogic.getCultures(sourcebooks, true),

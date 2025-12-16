@@ -1,9 +1,9 @@
-import { Career } from "@/forgesteel/models/career";
-import { CareerLite } from "../models/career-lite";
-import { FeatureLanguageChoice, FeaturePerk, FeatureSkillChoice } from "@/forgesteel/models/feature";
-import { FeatureType } from "@/forgesteel/enums/feature-type";
-import { SourcebookLogic } from "@/forgesteel/logic/sourcebook-logic";
-import { CareerData } from "@/forgesteel/data/career-data";
+import { Career } from 'forgesteel';
+import { CareerLite } from '../models/career-lite';
+import { FeatureLanguageChoice, FeaturePerk, FeatureSkillChoice } from 'forgesteel';
+import { FeatureType } from 'forgesteel';
+import { SourcebookLogic } from 'forgesteel';
+import { CareerData } from 'forgesteel';
 
 export class CareerConverter {
     static fromCareer(career: Career): CareerLite {
@@ -42,8 +42,9 @@ export class CareerConverter {
         return lite;
     }
 
-    static toCareer(careerLite: CareerLite): Career {
-        const sourcebooks = SourcebookLogic.getSourcebooks();
+    static async toCareer(careerLite: CareerLite): Promise<Career> {
+        const allActiveSourcebooks = Object.keys(SourcebookLogic.registry);
+        const sourcebooks = await SourcebookLogic.getSourcebooks(allActiveSourcebooks);
 
         const rootCareer = Object.values(CareerData).find(c => (c as Career).id === careerLite.careerId) as Career;
 

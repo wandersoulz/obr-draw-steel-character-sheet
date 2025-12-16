@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { HeroLite } from '@/models/hero-lite';
-import { HeroData } from '@/forgesteel/data/hero-data';
-import { Hero } from '@/forgesteel/models/hero';
+import { HeroData } from 'forgesteel';
+import { Hero } from 'forgesteel';
 
 interface GmState {
   characters: HeroLite[];

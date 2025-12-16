@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import OBR, { Player } from '@owlbear-rodeo/sdk';
 import { usePlayerStore } from '@/stores/playerStore';
 import { useGmStore } from '@/stores/gmStore';
-import { Hero } from '@/forgesteel/models/hero';
+import { Hero } from 'forgesteel';
 import { HeroLite } from '@/models/hero-lite';
 import { CHARACTER_ASSIGNMENT_CHANNEL } from '@/constants';
 

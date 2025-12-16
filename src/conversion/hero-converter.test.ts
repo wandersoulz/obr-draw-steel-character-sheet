@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { HeroData } from '@/forgesteel/data/hero-data';
+import { HeroData } from 'forgesteel';
 import { HeroLite } from '@/models/hero-lite';
-import { Hero } from '@/forgesteel/models/hero';
+import { Hero } from 'forgesteel';
 
 describe('Hero Conversion', () => {
     const heroes = Object.values(HeroData) as Hero[];

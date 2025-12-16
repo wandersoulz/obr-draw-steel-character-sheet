@@ -1,4 +1,4 @@
-import { Characteristic } from "@/forgesteel/enums/characteristic";
+import { Characteristic } from 'forgesteel';
 
 export interface ClassLite {
     classId: string;

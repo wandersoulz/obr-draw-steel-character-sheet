@@ -2,7 +2,6 @@ import { usePlayerCharacters } from "./hooks/usePlayerCharacters";
 import { Link } from "react-router-dom";
 import OBR from "@owlbear-rodeo/sdk";
 import { WIZARD_ID } from "./constants";
-import { HeroLite } from "./models/hero-lite";
 
 interface CharacterListViewProps {
     playerId: string;
@@ -35,12 +34,6 @@ export default function CharacterListView({ playerId, role }: CharacterListViewP
         );
     }
 
-    const getCharacterSubtitle = (character: HeroLite) => {
-        const ancestry = character.getAncestry();
-        const heroClass = character.getClass();
-        return `${ancestry.name} ${heroClass.name}`;
-    }
-
     return (
         <div className="p-4">
             <h1 className="text-2xl font-bold mb-4">My Characters</h1>
@@ -49,7 +42,7 @@ export default function CharacterListView({ playerId, role }: CharacterListViewP
                     <li key={character.id} className="bg-slate-800 p-4 rounded hover:bg-slate-700">
                         <Link to={`/character/${character.id}`} className="flex flex-col h-full">
                             <p className="font-bold truncate">{character.name}</p>
-                            <p className="text-xs text-slate-400 truncate">{getCharacterSubtitle(character)}</p>
+                            <p className="text-xs text-slate-400 truncate"></p>
                         </Link>
                     </li>
                 ))}

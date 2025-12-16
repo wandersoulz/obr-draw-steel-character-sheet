@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AbilitySheet } from '@/forgesteel/models/classic-sheets/ability-sheet';
+import { AbilitySheet } from 'forgesteel';
 import { DrawSteelSymbolText } from '@/components/ability/ds-symbol-text-component';
 import { Markdown } from '@/components/controls/markdown/markdown';
 

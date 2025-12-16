@@ -1,9 +1,9 @@
-import { Complication } from "@/forgesteel/models/complication";
-import { ComplicationLite } from "../models/complication-lite";
-import { Feature, FeatureChoice, FeatureItemChoice, FeatureLanguageChoice, FeatureRetainer, FeatureSkillChoice } from "@/forgesteel/models/feature";
-import { FeatureType } from "@/forgesteel/enums/feature-type";
-import { SourcebookLogic } from "@/forgesteel/logic/sourcebook-logic";
-import { ComplicationData } from "@/forgesteel/data/complication-data";
+import { Complication } from 'forgesteel';
+import { ComplicationLite } from '../models/complication-lite';
+import { Feature, FeatureChoice, FeatureItemChoice, FeatureLanguageChoice, FeatureRetainer, FeatureSkillChoice } from 'forgesteel';
+import { FeatureType } from 'forgesteel';
+import { SourcebookLogic } from 'forgesteel';
+import { ComplicationData } from 'forgesteel';
 
 export class ComplicationConverter {
     static fromComplication(complication: Complication | null): ComplicationLite | null {
@@ -59,12 +59,13 @@ export class ComplicationConverter {
         return lite;
     }
 
-    static toComplication(complicationLite: ComplicationLite | null): Complication | null {
+    static async toComplication(complicationLite: ComplicationLite | null): Promise<Complication | null> {
         if (!complicationLite) {
             return null;
         }
 
-        const sourcebooks = SourcebookLogic.getSourcebooks();
+        const allActiveSourcebooks = Object.keys(SourcebookLogic.registry);
+        const sourcebooks = await SourcebookLogic.getSourcebooks(allActiveSourcebooks);
 
         const rootComplication = Object.values(ComplicationData).find(c => (c as Complication).id === complicationLite.complicationId) as Complication;
 

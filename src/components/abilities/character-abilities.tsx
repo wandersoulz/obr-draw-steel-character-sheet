@@ -1,16 +1,18 @@
-import { AbilityData } from "@/forgesteel/data/ability-data";
-import { ClassicSheetBuilder } from "@/forgesteel/logic/classic-sheet/classic-sheet-builder";
-import { HeroLogic } from "@/forgesteel/logic/hero-logic";
-import { Hero } from "@/forgesteel/models/hero";
-import { Sourcebook } from "@/forgesteel/models/sourcebook";
+import { AbilityData } from 'forgesteel';
+import { ClassicSheetBuilder } from 'forgesteel';
+import { HeroLogic } from 'forgesteel';
+import { Hero } from 'forgesteel';
+import { Sourcebook } from 'forgesteel';
 import { AbilityCard } from "../ability/AbilityCard";
 
 interface CharacterAbilitiesProps {
-    hero: Hero;
+    hero?: Hero;
     sourcebooks: Sourcebook[];
 }
 
 export function CharacterAbilities({ hero, sourcebooks }: CharacterAbilitiesProps) {
+    if (!hero) return <div></div>;
+    
     const heroicResourceName = HeroLogic.getHeroicResources(hero)[0].name;
     const abilities = HeroLogic.getAbilities(hero, sourcebooks, []).map(a => a.ability);
 
