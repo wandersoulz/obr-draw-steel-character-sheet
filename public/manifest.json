@@ -1,12 +1,12 @@
 {
   "name": "Draw Steel Character Sheet",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "manifest_version": 1,
   "description": "Character sheet integration for Draw Steel RPG.",
-  "author": "Your Name",
+  "author": "Robert Higgins",
   "icon": "/icon.svg", 
   "action": {
-    "title": "Draw Steel",
+    "title": "Draw Steel Character Sheet",
     "icon": "/icon.svg",
     "popover": "/index.html"
   }

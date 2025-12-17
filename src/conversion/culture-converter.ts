@@ -1,30 +1,25 @@
-import { Culture } from 'forgesteel';
+import { CultureInterface, FeatureSkillChoiceInterface, FeatureLanguageChoiceInterface, ActiveSourcebooks } from 'forgesteel';
 import { CultureLite } from '../models/culture-lite';
-import { FeatureSkillChoice, FeatureLanguageChoice } from 'forgesteel';
-import { SourcebookLogic } from 'forgesteel';
 import { CultureData, EnvironmentData, OrganizationData, UpbringingData } from 'forgesteel';
 import { AncestryData } from 'forgesteel';
 
 export class CultureConverter {
-    static fromCulture(culture: Culture): CultureLite {
+    static fromCulture(culture: CultureInterface): CultureLite {
         return {
             cultureId: culture.id,
-            selectedLanguage: (culture.language as FeatureLanguageChoice).data.selected,
-            selectedEnvironment: culture.environment ? { [culture.environment!.id]: (culture.environment as FeatureSkillChoice).data.selected } : {},
-            selectedOrganization: culture.organization ? { [culture.organization!.id]: (culture.organization as FeatureSkillChoice).data.selected } : {},
-            selectedUpbringing: culture.upbringing ? { [culture.upbringing!.id]: (culture.upbringing as FeatureSkillChoice).data.selected } : {},
+            selectedLanguage: (culture.language as FeatureLanguageChoiceInterface).data.selected,
+            selectedEnvironment: culture.environment ? { [culture.environment!.id]: (culture.environment as FeatureSkillChoiceInterface).data.selected } : {},
+            selectedOrganization: culture.organization ? { [culture.organization!.id]: (culture.organization as FeatureSkillChoiceInterface).data.selected } : {},
+            selectedUpbringing: culture.upbringing ? { [culture.upbringing!.id]: (culture.upbringing as FeatureSkillChoiceInterface).data.selected } : {},
         }
     }
 
-    static async toCulture(cultureLite: CultureLite): Promise<Culture> {
-        const allSourcebookIds = Object.keys(SourcebookLogic.registry)
-        const sourcebooks = await SourcebookLogic.getSourcebooks(allSourcebookIds);
-
+    static toCulture(cultureLite: CultureLite): CultureInterface {
         const allCultures = [
-            ...SourcebookLogic.getCultures(sourcebooks, true),
+            ...ActiveSourcebooks.getInstance().getCultures(true),
             ...Object.values(AncestryData).map(ancestry => ancestry.culture),
             CultureData.bespoke,
-        ].filter((c): c is Culture => c !== null && c !== undefined);
+        ].filter((c): c is CultureInterface => c !== null && c !== undefined);
         
         const rootCulture = allCultures.find(c => c.id === cultureLite.cultureId);
 
@@ -34,7 +29,7 @@ export class CultureConverter {
 
         const specificCulture = Object.assign({}, rootCulture);
 
-        (specificCulture.language as FeatureLanguageChoice).data.selected = cultureLite.selectedLanguage;
+        (specificCulture.language as FeatureLanguageChoiceInterface).data.selected = cultureLite.selectedLanguage;
 
 
         specificCulture.environment = Object.assign({}, EnvironmentData.getEnvironments().find(e => e.id == Object.keys(cultureLite.selectedEnvironment)[0])!);

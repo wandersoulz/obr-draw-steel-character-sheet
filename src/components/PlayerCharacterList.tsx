@@ -10,8 +10,11 @@ interface PlayerCharacterListProps {
 export default function PlayerCharacterList({ characters }: PlayerCharacterListProps) {
 
   const getCharacterSubtitle = async (character: HeroLite) => {
-    const ancestry = await character.getAncestry();
-    const heroClass = await character.getClass();
+    const ancestry = character.getAncestry();
+    const heroClass = character.getClass();
+    if (!ancestry || !heroClass) {
+      return "";
+    }
     return `${ancestry.name} ${heroClass.name}`;
   }
 

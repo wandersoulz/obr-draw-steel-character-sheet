@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AbilitySheet } from 'forgesteel';
+import { AbilitySheetInterface } from 'forgesteel';
 import { DrawSteelSymbolText } from '@/components/ability/ds-symbol-text-component';
 import { Markdown } from '@/components/controls/markdown/markdown';
 
@@ -10,7 +10,7 @@ import rollT3 from '@/assets/icons/power-roll-t3.svg';
 import targetIcon from '@/assets/icons/target.svg';
 
 interface Props {
-    ability: AbilitySheet;
+    ability: AbilitySheetInterface;
     heroicResourceName: string;
 }
 

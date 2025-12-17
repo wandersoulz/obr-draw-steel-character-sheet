@@ -1,14 +1,12 @@
-import { HeroClass } from 'forgesteel';
+import { ActiveSourcebooks, HeroClassInterface } from 'forgesteel';
 import { ClassLite } from '../models/class-lite';
-import { Feature, FeatureChoice, FeatureClassAbility, FeatureKit, FeaturePerk, FeatureSkillChoice } from 'forgesteel';
+import { FeatureInterface, FeatureChoiceInterface, FeatureClassAbilityInterface, FeatureKitInterface, FeaturePerkInterface, FeatureSkillChoiceInterface } from 'forgesteel';
 import { FeatureType } from 'forgesteel';
-import { SourcebookLogic } from 'forgesteel';
-import { ClassData } from 'forgesteel';
 
 export class ClassConverter {
 
-    private static getAllFeatures(heroClass: HeroClass): Feature[] {
-        let features: Feature[] = [];
+    private static getAllFeatures(heroClass: HeroClassInterface): FeatureInterface[] {
+        let features: FeatureInterface[] = [];
         heroClass.featuresByLevel.forEach(fl => features = features.concat(fl.features));
         heroClass.subclasses.filter(sc => sc.selected).forEach(sc => {
             sc.featuresByLevel.forEach(fl => features = features.concat(fl.features));
@@ -16,13 +14,13 @@ export class ClassConverter {
         return this.flattenFeaturesAndOptions(features);
     }
 
-    private static flattenFeaturesAndOptions(featureList: Feature[]): Feature[] {
-        let newList: Feature[] = [];
+    private static flattenFeaturesAndOptions(featureList: FeatureInterface[]): FeatureInterface[] {
+        let newList: FeatureInterface[] = [];
 
         featureList.forEach(feat => {
             newList.push(feat);
             if (feat.type === FeatureType.Choice) {
-                const choiceFeature = (feat as FeatureChoice);
+                const choiceFeature = (feat as FeatureChoiceInterface);
                 newList = newList.concat(this.flattenFeaturesAndOptions(choiceFeature.data.options.map(option => option.feature)));
             }
         });
@@ -30,7 +28,7 @@ export class ClassConverter {
         return newList;
     }
 
-    static fromClass(heroClass: HeroClass): ClassLite {
+    static fromClass(heroClass: HeroClassInterface): ClassLite {
         const lite: ClassLite = {
             classId: heroClass.id,
             level: heroClass.level,
@@ -48,35 +46,35 @@ export class ClassConverter {
         for (const feat of allFeatures) {
             switch (feat.type) {
                 case FeatureType.SkillChoice: {
-                    const selected = (feat as FeatureSkillChoice).data.selected;
+                    const selected = (feat as FeatureSkillChoiceInterface).data.selected;
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
                     break;
                 }
                 case FeatureType.Perk: {
-                    const selected = (feat as FeaturePerk).data.selected.map(p => p.id);
+                    const selected = (feat as FeaturePerkInterface).data.selected.map(p => p.id);
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
                     break;
                 }
                 case FeatureType.ClassAbility: {
-                    const selected = (feat as FeatureClassAbility).data.selectedIDs;
+                    const selected = (feat as FeatureClassAbilityInterface).data.selectedIDs;
                     if (selected.length > 0) {
                         selected.forEach(select => selectedAbilities.add(select));
                     }
                     break;
                 }
                 case FeatureType.Choice: {
-                    const selected = (feat as FeatureChoice).data.selected.map(f => f.id);
+                    const selected = (feat as FeatureChoiceInterface).data.selected.map(f => f.id);
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
                     break;
                 }
                 case FeatureType.Kit: {
-                    const selected = (feat as FeatureKit).data.selected.map(k => k.id);
+                    const selected = (feat as FeatureKitInterface).data.selected.map(k => k.id);
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
@@ -88,17 +86,15 @@ export class ClassConverter {
         return lite;
     }
 
-    static async toClass(classLite: ClassLite): Promise<HeroClass> {
-        const allSourcebookIds = Object.keys(SourcebookLogic.registry);
-        const sourcebooks = await SourcebookLogic.getSourcebooks(allSourcebookIds);
+    static toClass(classLite: ClassLite): HeroClassInterface | null{
+        const activeSourcebooks = ActiveSourcebooks.getInstance();
+        const classes = activeSourcebooks.getClasses();
 
-        const rootClass = Object.values(ClassData).find(c => (c as HeroClass).id === classLite.classId) as HeroClass;
+        const rootClass = classes.find(c => c.id === classLite.classId);
 
-        if (!rootClass) {
-            throw new Error(`Could not find class with id ${classLite.classId}`);
-        }
+        if (!rootClass) return null;
 
-        const specificClass = JSON.parse(JSON.stringify(rootClass)) as HeroClass;
+        const specificClass = JSON.parse(JSON.stringify(rootClass)) as HeroClassInterface;
 
         specificClass.level = classLite.level;
         specificClass.primaryCharacteristics = classLite.primaryCharacteristics;
@@ -113,24 +109,24 @@ export class ClassConverter {
             switch (feat.type) {
                 case FeatureType.SkillChoice: {
                     if (classLite.selectedFeatures[feat.id]) {
-                        (feat as FeatureSkillChoice).data.selected = classLite.selectedFeatures[feat.id];
+                        (feat as FeatureSkillChoiceInterface).data.selected = classLite.selectedFeatures[feat.id];
                     }
                     break;
                 }
                 case FeatureType.Perk: {
                     if (classLite.selectedFeatures[feat.id]) {
-                        const allPerks = SourcebookLogic.getPerks(sourcebooks);
-                        (feat as FeaturePerk).data.selected = classLite.selectedFeatures[feat.id].map(id => allPerks.find(p => p.id === id)!);
+                        const allPerks = activeSourcebooks.getPerks();
+                        (feat as FeaturePerkInterface).data.selected = classLite.selectedFeatures[feat.id].map(id => allPerks.find(p => p.id === id)!);
                     }
                     break;
                 }
                 case FeatureType.ClassAbility: {
-                    (feat as FeatureClassAbility).data.selectedIDs = classLite.selectedAbilities;
+                    (feat as FeatureClassAbilityInterface).data.selectedIDs = classLite.selectedAbilities;
                     break;
                 }
                 case FeatureType.Choice: {
                     if (classLite.selectedFeatures[feat.id]) {
-                        const choiceFeature = feat as FeatureChoice;
+                        const choiceFeature = feat as FeatureChoiceInterface;
                         choiceFeature.data.selected = classLite.selectedFeatures[feat.id].map(id => 
                             this.flattenFeaturesAndOptions(choiceFeature.data.options.map(o => o.feature)).find(f => f.id === id)!
                         );
@@ -139,8 +135,8 @@ export class ClassConverter {
                 }
                 case FeatureType.Kit: {
                     if (classLite.selectedFeatures[feat.id]) {
-                        const allKits = SourcebookLogic.getKits(sourcebooks);
-                        (feat as FeatureKit).data.selected = classLite.selectedFeatures[feat.id].map(id => allKits.find(k => k.id === id)!);
+                        const allKits = activeSourcebooks.getKits();
+                        (feat as FeatureKitInterface).data.selected = classLite.selectedFeatures[feat.id].map(id => allKits.find(k => k.id === id)!);
                     }
                     break;
                 }

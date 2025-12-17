@@ -1,12 +1,10 @@
-import { Complication } from 'forgesteel';
+import { ActiveSourcebooks } from 'forgesteel';
 import { ComplicationLite } from '../models/complication-lite';
-import { Feature, FeatureChoice, FeatureItemChoice, FeatureLanguageChoice, FeatureRetainer, FeatureSkillChoice } from 'forgesteel';
+import { ComplicationInterface, FeatureInterface, FeatureChoiceInterface, FeatureItemChoiceInterface, FeatureLanguageChoiceInterface, FeatureRetainerInterface, FeatureSkillChoiceInterface } from 'forgesteel';
 import { FeatureType } from 'forgesteel';
-import { SourcebookLogic } from 'forgesteel';
-import { ComplicationData } from 'forgesteel';
 
 export class ComplicationConverter {
-    static fromComplication(complication: Complication | null): ComplicationLite | null {
+    static fromComplication(complication: ComplicationInterface | null): ComplicationLite | null {
         if (!complication) {
             return null;
         }
@@ -19,35 +17,35 @@ export class ComplicationConverter {
         for (const feat of complication.features) {
             switch (feat.type) {
                 case FeatureType.SkillChoice: {
-                    const selected = (feat as FeatureSkillChoice).data.selected;
+                    const selected = (feat as FeatureSkillChoiceInterface).data.selected;
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
                     break;
                 }
                 case FeatureType.LanguageChoice: {
-                    const selected = (feat as FeatureLanguageChoice).data.selected;
+                    const selected = (feat as FeatureLanguageChoiceInterface).data.selected;
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
                     break;
                 }
                 case FeatureType.ItemChoice: {
-                    const selected = (feat as FeatureItemChoice).data.selected.map(i => i.id);
+                    const selected = (feat as FeatureItemChoiceInterface).data.selected.map(i => i.id);
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
                     break;
                 }
                 case FeatureType.Retainer: {
-                    const selected = (feat as FeatureRetainer).data.selected;
+                    const selected = (feat as FeatureRetainerInterface).data.selected;
                     if (selected) {
                         lite.selectedFeatures[feat.id] = [selected.id];
                     }
                     break;
                 }
                 case FeatureType.Choice: {
-                    const selected = (feat as FeatureChoice).data.selected.map(f => f.id);
+                    const selected = (feat as FeatureChoiceInterface).data.selected.map(f => f.id);
                     if (selected.length > 0) {
                         lite.selectedFeatures[feat.id] = selected;
                     }
@@ -59,15 +57,15 @@ export class ComplicationConverter {
         return lite;
     }
 
-    static async toComplication(complicationLite: ComplicationLite | null): Promise<Complication | null> {
+    static toComplication(complicationLite: ComplicationLite | null): ComplicationInterface | null {
         if (!complicationLite) {
             return null;
         }
 
-        const allActiveSourcebooks = Object.keys(SourcebookLogic.registry);
-        const sourcebooks = await SourcebookLogic.getSourcebooks(allActiveSourcebooks);
+        const activeSourcebooks = ActiveSourcebooks.getInstance();
+        const allComplications = activeSourcebooks.getComplications();
 
-        const rootComplication = Object.values(ComplicationData).find(c => (c as Complication).id === complicationLite.complicationId) as Complication;
+        const rootComplication = allComplications.find(c => c.id === complicationLite.complicationId);
 
         if (!rootComplication) {
             throw new Error(`Could not find complication with id ${complicationLite.complicationId}`);
@@ -80,25 +78,25 @@ export class ComplicationConverter {
             if (feat) {
                 switch (feat.type) {
                     case FeatureType.SkillChoice: {
-                        (feat as FeatureSkillChoice).data.selected = complicationLite.selectedFeatures[featureId];
+                        (feat as FeatureSkillChoiceInterface).data.selected = complicationLite.selectedFeatures[featureId];
                         break;
                     }
                     case FeatureType.LanguageChoice: {
-                        (feat as FeatureLanguageChoice).data.selected = complicationLite.selectedFeatures[featureId];
+                        (feat as FeatureLanguageChoiceInterface).data.selected = complicationLite.selectedFeatures[featureId];
                         break;
                     }
                     case FeatureType.ItemChoice: {
-                        const allItems = SourcebookLogic.getItems(sourcebooks);
-                        (feat as FeatureItemChoice).data.selected = complicationLite.selectedFeatures[featureId].map(id => allItems.find(i => i.id === id)!);
+                        const allItems = activeSourcebooks.getItems();
+                        (feat as FeatureItemChoiceInterface).data.selected = complicationLite.selectedFeatures[featureId].map(id => allItems.find(i => i.id === id)!);
                         break;
                     }
                     case FeatureType.Retainer: {
-                        const allMonsters = SourcebookLogic.getMonsters(sourcebooks);
-                        (feat as FeatureRetainer).data.selected = allMonsters.find(m => m.id === complicationLite.selectedFeatures[featureId][0])!;
+                        const allMonsters = activeSourcebooks.getMonsters();
+                        (feat as FeatureRetainerInterface).data.selected = allMonsters.find(m => m.id === complicationLite.selectedFeatures[featureId][0])!;
                         break;
                     }
                     case FeatureType.Choice: {
-                        const choiceFeature = feat as FeatureChoice;
+                        const choiceFeature = feat as FeatureChoiceInterface;
                         const flattenedOptions = this.flattenFeaturesAndOptions(choiceFeature.data.options.map(o => o.feature));
                         choiceFeature.data.selected = complicationLite.selectedFeatures[featureId].map(id => 
                             flattenedOptions.find(f => f.id === id)!
@@ -112,13 +110,13 @@ export class ComplicationConverter {
         return specificComplication;
     }
 
-    private static flattenFeaturesAndOptions(featureList: Feature[]): Feature[] {
-        let newList: Feature[] = [];
+    private static flattenFeaturesAndOptions(featureList: FeatureInterface[]): FeatureInterface[] {
+        let newList: FeatureInterface[] = [];
 
         featureList.forEach(feat => {
             newList.push(feat);
             if (feat.type === FeatureType.Choice) {
-                const choiceFeature = (feat as FeatureChoice);
+                const choiceFeature = (feat as FeatureChoiceInterface);
                 newList = newList.concat(this.flattenFeaturesAndOptions(choiceFeature.data.options.map(option => option.feature)));
             }
         });

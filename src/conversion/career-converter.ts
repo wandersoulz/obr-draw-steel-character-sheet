@@ -1,12 +1,10 @@
-import { Career } from 'forgesteel';
+import { ActiveSourcebooks, CareerInterface } from 'forgesteel';
 import { CareerLite } from '../models/career-lite';
-import { FeatureLanguageChoice, FeaturePerk, FeatureSkillChoice } from 'forgesteel';
+import { FeatureLanguageChoiceInterface, FeaturePerkInterface, FeatureSkillChoiceInterface } from 'forgesteel';
 import { FeatureType } from 'forgesteel';
-import { SourcebookLogic } from 'forgesteel';
-import { CareerData } from 'forgesteel';
 
 export class CareerConverter {
-    static fromCareer(career: Career): CareerLite {
+    static fromCareer(career: CareerInterface): CareerLite {
         const lite: CareerLite = {
             careerId: career.id,
             selectedIncitingIncidentId: career.incitingIncidents.selected?.id ?? null,
@@ -16,21 +14,21 @@ export class CareerConverter {
         for (const feat of career.features) {
             switch (feat.type) {
                 case FeatureType.SkillChoice: {
-                    const selectedSkills = (feat as FeatureSkillChoice).data.selected;
+                    const selectedSkills = (feat as FeatureSkillChoiceInterface).data.selected;
                     if (selectedSkills.length > 0) {
                         lite.selectedFeatures[feat.id] = selectedSkills;
                     }
                     break;
                 }
                 case FeatureType.LanguageChoice: {
-                    const selectedLanguages = (feat as FeatureLanguageChoice).data.selected;
+                    const selectedLanguages = (feat as FeatureLanguageChoiceInterface).data.selected;
                     if (selectedLanguages.length > 0) {
                         lite.selectedFeatures[feat.id] = selectedLanguages;
                     }
                     break;
                 }
                 case FeatureType.Perk: {
-                    const selectedPerks = (feat as FeaturePerk).data.selected.map(p => p.id);
+                    const selectedPerks = (feat as FeaturePerkInterface).data.selected.map(p => p.id);
                     if (selectedPerks.length > 0) {
                         lite.selectedFeatures[feat.id] = selectedPerks;
                     }
@@ -42,17 +40,14 @@ export class CareerConverter {
         return lite;
     }
 
-    static async toCareer(careerLite: CareerLite): Promise<Career> {
-        const allActiveSourcebooks = Object.keys(SourcebookLogic.registry);
-        const sourcebooks = await SourcebookLogic.getSourcebooks(allActiveSourcebooks);
+    static toCareer(careerLite: CareerLite): CareerInterface | null {
+        const allActiveSourcebooks = ActiveSourcebooks.getInstance();
+        const allCareers = allActiveSourcebooks.getCareers();
+        const rootCareer = allCareers.find(c => c.id === careerLite.careerId);
 
-        const rootCareer = Object.values(CareerData).find(c => (c as Career).id === careerLite.careerId) as Career;
+        if (!rootCareer) return null;
 
-        if (!rootCareer) {
-            throw new Error(`Could not find career with id ${careerLite.careerId}`);
-        }
-
-        const specificCareer: Career = Object.assign({}, rootCareer);
+        const specificCareer: CareerInterface = Object.assign({}, rootCareer);
 
         specificCareer.incitingIncidents.selected = specificCareer.incitingIncidents.options.find(o => o.id === careerLite.selectedIncitingIncidentId) ?? null;
 
@@ -61,16 +56,16 @@ export class CareerConverter {
             if (feat) {
                 switch (feat.type) {
                     case FeatureType.SkillChoice: {
-                        (feat as FeatureSkillChoice).data.selected = careerLite.selectedFeatures[featureId];
+                        (feat as FeatureSkillChoiceInterface).data.selected = careerLite.selectedFeatures[featureId];
                         break;
                     }
                     case FeatureType.LanguageChoice: {
-                        (feat as FeatureLanguageChoice).data.selected = careerLite.selectedFeatures[featureId];
+                        (feat as FeatureLanguageChoiceInterface).data.selected = careerLite.selectedFeatures[featureId];
                         break;
                     }
                     case FeatureType.Perk: {
-                        const allPerks = SourcebookLogic.getPerks(sourcebooks);
-                        (feat as FeaturePerk).data.selected = careerLite.selectedFeatures[featureId].map(perkId => allPerks.find(p => p.id === perkId)!);
+                        const allPerks = allActiveSourcebooks.getPerks();
+                        (feat as FeaturePerkInterface).data.selected = careerLite.selectedFeatures[featureId].map(perkId => allPerks.find(p => p.id === perkId)!);
                         break;
                     }
                 }

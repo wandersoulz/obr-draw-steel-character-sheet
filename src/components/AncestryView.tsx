@@ -1,20 +1,15 @@
-import { Hero } from 'forgesteel';
-import { HeroLogic } from 'forgesteel';
-import { Sourcebook } from 'forgesteel';
-import { Feature } from 'forgesteel';
+import { Hero, FeatureInterface } from 'forgesteel';
 import { Markdown } from "./controls/markdown/markdown";
-import { FeatureLogic } from 'forgesteel';
 
 interface AncestryViewProps {
     hero?: Hero;
-    sourcebooks: Sourcebook[];
 }
 
-export default function AncestryView({ hero, sourcebooks }: AncestryViewProps) {
-    if (!hero) return <div></div>;
+export default function AncestryView({ hero }: AncestryViewProps) {
+    if (!hero || !hero.ancestry || !hero.class) return <div></div>;
     
-    const languages = HeroLogic.getLanguages(hero, sourcebooks);
-    const features = FeatureLogic.getFeaturesFromAncestry(hero.ancestry!, hero);
+    const languages = hero.getLanguages();
+    const features = hero.ancestry.getFeatures(hero.class.level);
 
     const featuresBySource = features.reduce((acc, feature) => {
         const source = feature.source;
@@ -23,7 +18,7 @@ export default function AncestryView({ hero, sourcebooks }: AncestryViewProps) {
         }
         acc[source].push(feature.feature);
         return acc;
-    }, {} as Record<string, Feature[]>);
+    }, {} as Record<string, FeatureInterface[]>);
 
     return (
         <div className="w-full flex flex-col gap-3">

@@ -1,5 +1,4 @@
-import { AbilityCustomization, Hero } from 'forgesteel';
-import { HeroState } from 'forgesteel';
+import { AbilityCustomizationInterface, Hero, HeroInterface, HeroStateInterface } from 'forgesteel';
 import { AncestryLite } from './ancestry-lite';
 import { AncestryConverter } from '@/conversion/ancestry-converter';
 import { CultureConverter } from '@/conversion/culture-converter';
@@ -10,7 +9,7 @@ import { ClassLite } from './class-lite';
 import { ClassConverter } from '@/conversion/class-converter';
 import { ComplicationLite } from './complication-lite';
 import { ComplicationConverter } from '@/conversion/complication-converter';
-import { Feature } from 'forgesteel';
+import { FeatureInterface } from 'forgesteel';
 
 export class HeroLite {
     id: string;
@@ -23,9 +22,9 @@ export class HeroLite {
     class: ClassLite;
     complication: ComplicationLite | null;
 
-    features: Feature[];
-    abilityCustomizations: AbilityCustomization[];
-    state: HeroState;
+    features: FeatureInterface[];
+    abilityCustomizations: AbilityCustomizationInterface[];
+    state: HeroStateInterface;
 
     constructor(
         id: string,
@@ -35,9 +34,9 @@ export class HeroLite {
         career: CareerLite,
         _class: ClassLite,
         complication: ComplicationLite | null,
-        features: Feature[],
-        abilityCustomizations: AbilityCustomization[],
-        state: HeroState,
+        features: FeatureInterface[],
+        abilityCustomizations: AbilityCustomizationInterface[],
+        state: HeroStateInterface,
         playerId?: string
     ) {
         this.id = id;
@@ -114,15 +113,15 @@ export class HeroLite {
         );
     }
 
-    async toHero(): Promise<Hero> {
-        const hero: Hero = {
+    toHero(): Hero {
+        const heroConfig: HeroInterface = {
             id: this.id,
             name: this.name,
             ancestry: this.getAncestry(),
-            career: await CareerConverter.toCareer(this.career),
-            culture: await CultureConverter.toCulture(this.culture),
-            class: await ClassConverter.toClass(this.class),
-            complication: this.complication ? await ComplicationConverter.toComplication(this.complication) : null,
+            career: CareerConverter.toCareer(this.career),
+            culture: CultureConverter.toCulture(this.culture),
+            class: ClassConverter.toClass(this.class),
+            complication: this.complication ? ComplicationConverter.toComplication(this.complication) : null,
             features: this.features,
             state: this.state,
             picture: null,
@@ -131,7 +130,7 @@ export class HeroLite {
             abilityCustomizations: []
         };
         
-        return hero;
+        return new Hero(heroConfig);
     }
 
     public getAncestry() {

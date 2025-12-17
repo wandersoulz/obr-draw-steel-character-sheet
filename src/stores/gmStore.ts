@@ -6,16 +6,21 @@ import { Hero } from 'forgesteel';
 
 interface GmState {
   characters: HeroLite[];
+  malice: number;
   init: () => void;
   getCharacters: () => HeroLite[]
   addCharacter: (character: HeroLite) => void;
   updateCharacter: (character: HeroLite) => void;
+  incrementMalice: () => void;
+  decrementMalice: () => void;
+  setMalice: (value: number) => void;
 }
 
 export const useGmStore = create<GmState>()(
   persist(
     (set, get) => ({
       characters: [],
+      malice: 0,
       init: () => {
         const { characters } = get();
         const newCharacters = [...characters].map(character => HeroLite.fromHeroLiteInterface(character));
@@ -35,6 +40,9 @@ export const useGmStore = create<GmState>()(
         set((state) => ({
           characters: state.characters.map((c) => (c.id === character.id ? character : c)),
         })),
+      incrementMalice: () => set((state) => ({ malice: state.malice + 1 })),
+      decrementMalice: () => set((state) => ({ malice: state.malice - 1 })),
+      setMalice: (value) => set({ malice: value }),
     }),
     {
       name: 'draw-steel-gm-storage',

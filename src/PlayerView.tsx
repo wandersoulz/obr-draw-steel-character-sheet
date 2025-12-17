@@ -1,15 +1,17 @@
 import { usePlayerCharacters } from "./hooks/usePlayerCharacters";
 import { Link } from "react-router-dom";
 import OBR from "@owlbear-rodeo/sdk";
-import { WIZARD_ID } from "./constants";
+import { SourcebookInterface } from "forgesteel";
 
-interface CharacterListViewProps {
+interface PlayerViewViewProps {
+    sourcebooks: SourcebookInterface[];
     playerId: string;
     role: "GM" | "PLAYER";
 }
 
-export default function CharacterListView({ playerId, role }: CharacterListViewProps) {
+export function PlayerView({ playerId, role, sourcebooks }: PlayerViewViewProps) {
     const { characters } = usePlayerCharacters(playerId, role);
+    if (sourcebooks.length == 0) return (<div></div>);
     if (characters.length === 0) {
         return (
             <div className="h-screen w-full bg-slate-900 text-white flex flex-col items-center justify-center p-6">
@@ -17,19 +19,6 @@ export default function CharacterListView({ playerId, role }: CharacterListViewP
                 <p className="mb-6 text-gray-400 text-center">
                     You don't have any Draw Steel characters yet.
                 </p>
-                <button
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => {
-                        OBR.popover.open({
-                            id: WIZARD_ID,
-                            url: "/#/Character_Wizard",
-                            width: 600,
-                            height: 600,
-                        });
-                    }}
-                >
-                    Create New Character
-                </button>
             </div>
         );
     }
@@ -47,19 +36,6 @@ export default function CharacterListView({ playerId, role }: CharacterListViewP
                     </li>
                 ))}
             </ul>
-             <button
-                className="mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-                onClick={() => {
-                    OBR.popover.open({
-                        id: WIZARD_ID,
-                        url: "/#/Character_Wizard",
-                        width: 600,
-                        height: 600,
-                    });
-                }}
-                >
-                    Create New Character
-                </button>
         </div>
     );
 }

@@ -25,7 +25,7 @@ export default function CounterTracker({
             <label className="text-xs text-slate-400 capitalize mb-1 text-center">{label}</label>
             <InputBackground color={color}>
                 <button 
-                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-700 transition-colors text-slate-300"
+                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-500 transition-colors text-slate-300"
                     onClick={decrementHandler}
                 >
                     <Minus size={14} strokeWidth={3.0} />
@@ -37,7 +37,7 @@ export default function CounterTracker({
                     className={cn("flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none")}
                 />
                 <button 
-                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-700 transition-colors text-slate-300"
+                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-500 transition-colors text-slate-300"
                     onClick={incrementHandler}
                 >
                     <Plus size={14} strokeWidth={3.0} />

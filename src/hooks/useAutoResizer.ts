@@ -16,7 +16,7 @@ export function useAutoResizer() {
       if (height <= 0) {
         return;
       }
-      OBR.action.setHeight(Math.round(height) + 100);
+      OBR.action.setHeight(Math.round(height));
     });
 
     if (containerRef.current) {

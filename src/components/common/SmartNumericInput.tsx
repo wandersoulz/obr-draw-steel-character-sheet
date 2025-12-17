@@ -55,7 +55,7 @@ export default function SmartNumericInput({
             value ={inputContent}
             onChange={(e) => {
                 if (inputProps.onChange) inputProps.onChange(e);
-                else runOnConfirm(e);
+                setInputContent(e.target.value);
             }}
             onBlur={(e) => {
                 if (inputProps.onBlur) inputProps.onBlur(e);

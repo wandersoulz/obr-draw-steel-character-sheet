@@ -1,11 +1,8 @@
 import { AncestryLite } from '@/models/ancestry-lite';
-import { AncestryData } from 'forgesteel';
-import { FeatureType } from 'forgesteel';
-import { Ancestry } from 'forgesteel';
-import { Feature, FeatureChoice, FeatureMultiple, FeatureSkillChoice } from 'forgesteel';
+import { Ancestry, FeatureType, FeatureInterface, FeatureChoiceInterface, FeatureMultipleInterface, FeatureSkillChoiceInterface, ActiveSourcebooks } from 'forgesteel';
 
 export class AncestryConverter {
-    static ancestryCache: Record<string, Feature[]> = {};
+    static ancestryCache: Record<string, FeatureInterface[]> = {};
 
     static fromAncestry(ancestry: Ancestry): AncestryLite {
         const lite: AncestryLite = {
@@ -18,14 +15,14 @@ export class AncestryConverter {
         for (const feat of allFeatures) {
             switch (feat.type) {
                 case FeatureType.Choice: {
-                    const selectedIds = (feat as FeatureChoice).data.selected.map(choice => choice.id);
+                    const selectedIds = (feat as FeatureChoiceInterface).data.selected.map(choice => choice.id);
                     if (selectedIds.length > 0) {
                         lite.selectedFeatures[feat.id] = selectedIds;
                     }
                     break;
                 }
                 case FeatureType.SkillChoice: {
-                    const selectedSkills = (feat as FeatureSkillChoice).data.selected;
+                    const selectedSkills = (feat as FeatureSkillChoiceInterface).data.selected;
                     if (selectedSkills.length > 0) {
                         lite.selectedFeatures[feat.id] = selectedSkills;
                     }
@@ -37,8 +34,11 @@ export class AncestryConverter {
         return lite;
     }
 
-    static toAncestry(ancestryLite: AncestryLite): Ancestry {
-        const rootAncestry = Object.values(AncestryData).find(val => val.id == ancestryLite.ancestryId) as Ancestry;
+    static toAncestry(ancestryLite: AncestryLite): Ancestry | null {
+        const allActiveSourcebooks = ActiveSourcebooks.getInstance();
+        const ancestryData = allActiveSourcebooks.getAncestries();
+        const rootAncestry = ancestryData.find(val => val.id == ancestryLite.ancestryId);
+        if (!rootAncestry) return null;
         const specificAncestry = Object.assign({}, rootAncestry);
         
         const allFeatures = this.flattenFeaturesAndOptions(specificAncestry.features);
@@ -49,21 +49,21 @@ export class AncestryConverter {
                 switch (feat.type) {
                     case FeatureType.Choice: {
                         const selectedFeatures = ancestryLite.selectedFeatures[feat.id].map(featId => AncestryConverter.lookUpAncestryFeature(allFeatures, featId));
-                        (feat as FeatureChoice).data.selected = selectedFeatures;
+                        (feat as FeatureChoiceInterface).data.selected = selectedFeatures;
                         break;
                     }
                     case FeatureType.SkillChoice: {
-                        (feat as FeatureSkillChoice).data.selected = ancestryLite.selectedFeatures[feat.id];
+                        (feat as FeatureSkillChoiceInterface).data.selected = ancestryLite.selectedFeatures[feat.id];
                         break;
                     }
                 }
             }
         }
 
-        return specificAncestry;
+        return new Ancestry(specificAncestry);
     }
 
-    static lookUpAncestryFeature(features: Feature[], featureId: string): Feature {        
+    static lookUpAncestryFeature(features: FeatureInterface[], featureId: string): FeatureInterface {        
         const feat = features.find(feat => feat.id == featureId);
         if (!feat) {
             throw new Error(`Could not find feature with id ${featureId} in full fetures`);
@@ -71,16 +71,16 @@ export class AncestryConverter {
         return feat;
     }
 
-    static flattenFeaturesAndOptions(featureList: Feature[]): Feature[] {
-        let newList: Feature[] = [];
+    static flattenFeaturesAndOptions(featureList: FeatureInterface[]): FeatureInterface[] {
+        let newList: FeatureInterface[] = [];
 
         featureList.forEach(feat => {
             newList.push(feat);
             if (feat.type === FeatureType.Choice) {
-                const choiceFeature = (feat as FeatureChoice);
+                const choiceFeature = (feat as FeatureChoiceInterface);
                 newList = newList.concat(AncestryConverter.flattenFeaturesAndOptions(choiceFeature.data.options.map(option => option.feature)));
             } else if (feat.type === FeatureType.Multiple) {
-                const multipleFeature = (feat as FeatureMultiple);
+                const multipleFeature = (feat as FeatureMultipleInterface);
                 newList = newList.concat(AncestryConverter.flattenFeaturesAndOptions(multipleFeature.data.features));
             }
         });
