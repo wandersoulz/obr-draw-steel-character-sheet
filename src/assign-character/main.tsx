@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./../index.css";
+import "@/action/index.css";
 import { AssignCharacterView } from "./AssignCharacter";
 import OBR from "@owlbear-rodeo/sdk";
 
