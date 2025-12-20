@@ -14,7 +14,7 @@ import { FeatureInterface } from 'forgesteel';
 export class HeroLite {
     id: string;
     name: string;
-    playerId?: string;
+    tokenId: string;
 
     ancestry: AncestryLite;
     culture: CultureLite;
@@ -26,9 +26,13 @@ export class HeroLite {
     abilityCustomizations: AbilityCustomizationInterface[];
     state: HeroStateInterface;
 
+    maxStamina: number;
+
     constructor(
         id: string,
         name: string,
+        tokenId: string,
+        maxStamina: number,
         ancestry: AncestryLite,
         culture: CultureLite,
         career: CareerLite,
@@ -37,11 +41,11 @@ export class HeroLite {
         features: FeatureInterface[],
         abilityCustomizations: AbilityCustomizationInterface[],
         state: HeroStateInterface,
-        playerId?: string
     ) {
         this.id = id;
         this.name = name;
-        this.playerId = playerId;
+        this.tokenId = tokenId;
+        this.maxStamina = maxStamina;
         this.ancestry = ancestry;
         this.culture = culture;
         this.career = career;
@@ -56,6 +60,8 @@ export class HeroLite {
         return new HeroLite(
             this.id,
             this.name,
+            this.tokenId,
+            this.maxStamina,
             this.ancestry,
             this.culture,
             this.career,
@@ -64,7 +70,6 @@ export class HeroLite {
             this.features,
             this.abilityCustomizations,
             this.state,
-            this.playerId,
         );
     }
 
@@ -72,6 +77,8 @@ export class HeroLite {
         return new HeroLite(
             interfaceValue.id,
             interfaceValue.name,
+            interfaceValue.tokenId,
+            interfaceValue.maxStamina,
             interfaceValue.ancestry,
             interfaceValue.culture,
             interfaceValue.career,
@@ -80,17 +87,17 @@ export class HeroLite {
             interfaceValue.features,
             interfaceValue.abilityCustomizations,
             interfaceValue.state,
-            interfaceValue.playerId,
         );
     }
 
     update(partialUpdate: Partial<HeroLite>) {
         this.id = partialUpdate.id ?? this.id;
         this.name = partialUpdate.name ?? this.name;
+        this.tokenId = partialUpdate.tokenId ?? this.tokenId;
+        this.maxStamina = partialUpdate.maxStamina ?? this.maxStamina;
         this.ancestry = partialUpdate.ancestry ?? this.ancestry;
         this.culture = partialUpdate.culture ?? this.culture;
         this.state = partialUpdate.state ?? this.state;
-        this.playerId = partialUpdate.playerId ?? this.playerId;
         this.abilityCustomizations = partialUpdate.abilityCustomizations ?? this.abilityCustomizations;
         this.features = partialUpdate.features ?? this.features;
         this.class = partialUpdate.class ?? this.class;
@@ -102,6 +109,8 @@ export class HeroLite {
         return new HeroLite(
             hero.id,
             hero.name,
+            hero.folder,
+            hero.getStamina(),
             AncestryConverter.fromAncestry(hero.ancestry!),
             CultureConverter.fromCulture(hero.culture!),
             CareerConverter.fromCareer(hero.career!),
@@ -125,7 +134,7 @@ export class HeroLite {
             features: this.features,
             state: this.state,
             picture: null,
-            folder: '',
+            folder: this.tokenId,
             settingIDs: [],
             abilityCustomizations: []
         };

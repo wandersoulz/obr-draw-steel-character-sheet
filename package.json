@@ -15,6 +15,7 @@
     "@owlbear-rodeo/sdk": "^3.1.0",
     "autoprefixer": "^10.4.22",
     "forgesteel": "github:wandersoulz/forgesteel",
+    "lodash.debounce": "^4.0.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.0",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.17",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

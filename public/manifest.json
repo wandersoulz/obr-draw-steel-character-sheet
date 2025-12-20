@@ -4,10 +4,11 @@
   "manifest_version": 1,
   "description": "Character sheet integration for Draw Steel RPG.",
   "author": "Robert Higgins",
-  "icon": "/icon.svg", 
+  "icon": "/icon.svg",
+  "background_url": "/background.html",
   "action": {
     "title": "Draw Steel Character Sheet",
     "icon": "/icon.svg",
-    "popover": "/index.html"
+    "popover": "/action.html"
   }
 }

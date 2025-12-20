@@ -8,7 +8,6 @@ import InputBackground from "../common/InputBackground";
 
 interface SheetHeaderProps {
     hero?: Hero;
-    isGM: boolean;
     isOwner: boolean;
     onUpdate: (update: Partial<HeroLite>) => void;
 }
