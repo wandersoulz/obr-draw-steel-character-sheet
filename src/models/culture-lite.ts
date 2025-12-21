@@ -1,7 +1,10 @@
+import { FeatureInterface } from "forgesteel";
+
 export interface CultureLite {
     cultureId: string;
+    cultureName: string;
     selectedLanguage: string[];
-    selectedEnvironment: {[key: string]: string[]};
-    selectedOrganization: {[key: string]: string[]};
-    selectedUpbringing: {[key: string]: string[]};
+    selectedEnvironment: FeatureInterface | null;
+    selectedOrganization: FeatureInterface | null;
+    selectedUpbringing: FeatureInterface | null;
 }

@@ -1,58 +1,101 @@
 import { useParams, useNavigate } from "react-router-dom";
 import CharacterStats from "../components/character-stats/CharacterStats";
-import { HeroLite } from "../models/hero-lite";
+import { HeroLite } from "../../models/hero-lite";
 import { ChangeEvent, useEffect, useState } from "react";
-import { CharacterAbilities } from "../components/abilities/character-abilities";
-import { SourcebookInterface } from "forgesteel";
 import { ArrowLeft } from 'lucide-react';
-import { useAutoResizer } from "../hooks/useAutoResizer";
-import AncestryView from "../components/AncestryView";
-import { StandardAbilities } from "../components/abilities/standard-abilities";
-import { usePlayer } from "../hooks/usePlayer";
+import { useAutoResizer } from "../../hooks/useAutoResizer";
+import { usePlayer } from "../../hooks/usePlayer";
+import { useGmStore } from "@/stores/gmStore";
+import { CharacterAbilities } from "../components/abilities/character-abilities";
+import { Features } from "../components/features/features";
+import OBR from "@owlbear-rodeo/sdk";
+import { METADATA_KEYS } from "@/constants";
+import { usePlayerStore } from "@/stores/playerStore";
 
-interface CharacterSheetViewProps {
-    sourcebooks: SourcebookInterface[];
+interface CharacterSheetProps {
+    forgeSteelLoaded: boolean;
+    playerRole?: "GM" | "PLAYER";
 }
 
-export function CharacterSheet({ sourcebooks }: CharacterSheetViewProps) {
-    const [activeTab, setActiveTab] = useState('stats');
+export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetProps) {
+    const [activeTab, setActiveTab] = useState('tracking');
     const [activeCharacter, setActiveCharacter] = useState<HeroLite>();
     const { characterId } = useParams<{ characterId: string }>();
     const navigate = useNavigate();
     const containerRef = useAutoResizer();
-
+    const [isCurrentPlayer, setIsCurrentPlayer] = useState<boolean>(true);
     const { characters, updateCharacter } = usePlayer();
+    const updatePlayerCharacter = usePlayerStore((state) => state.updateCharacter);
+    const { playerCharacters, setPlayerCharacters } = useGmStore();
 
     useEffect(() => {
-        if (!activeCharacter || activeCharacter.id != characterId) {
-            const character = characters.find(c => c.id === characterId)
+        if (forgeSteelLoaded && (!activeCharacter || activeCharacter.id != characterId)) {
+            const character = characters.find(c => c.id === characterId);
             if (character) setActiveCharacter(character);
+            else {
+                if (playerRole == "PLAYER") throw new Error("Chosen character not found");
+
+                const character = Object.values(playerCharacters).flat().find((hero: HeroLite) => hero.id == characterId);
+                if (!character) throw new Error("Chosen character cannot be found among players");
+                setActiveCharacter(character);
+                setIsCurrentPlayer(false);
+            }
         }
-    }, [characters, sourcebooks]);
+    }, [characters, forgeSteelLoaded]);
+
+    useEffect(() => {
+        const unsubscribe = OBR.scene.items.onChange((items) => {
+            if (activeCharacter) {
+                const tokenCharacters = items
+                    .filter((item) => item.metadata[METADATA_KEYS.CHARACTER_DATA])
+                    .map((item) => item.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite);
+                const character = tokenCharacters.find((char) => char.id == activeCharacter.id);
+                if (character) {
+                    updatePlayerCharacter(character);
+                    setActiveCharacter(character);
+                }
+            }
+        });
+        return () => unsubscribe();
+    }, []);
 
     const onUpdate = (partialCharacter: Partial<HeroLite>) => {
         if (activeCharacter) {
-            const updatedChar: HeroLite = Object.assign(activeCharacter, partialCharacter);
-            updateCharacter(activeCharacter, partialCharacter);
+            const currCharacter = characters.find((c) => c.id == activeCharacter.id) || activeCharacter;
+            const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
             setActiveCharacter(updatedChar);
+            if (isCurrentPlayer) updateCharacter(currCharacter, partialCharacter);
+            else {
+                const newPlayerCharacters = Object.fromEntries(Object.entries(playerCharacters).map(([playerId, characters]) => {
+                    const foundCharacter = characters.find((character) => character.id == activeCharacter.id)
+                    if (foundCharacter) {
+                        return [
+                            playerId,
+                            characters.map((character) => character.id == foundCharacter.id ? foundCharacter : character)
+                        ];
+                    }
+                    return [playerId, characters];
+                }));
+
+                setPlayerCharacters(newPlayerCharacters);
+            }
         }
     };
-    
+
     let handler: number = 0;
     const handleCharacterNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value);
         if (activeCharacter) {
-            const updatedChar: HeroLite = Object.assign(activeCharacter, {name: event.target.value});
+            const updatedChar: HeroLite = Object.assign({}, Object.assign(activeCharacter, { name: event.target.value }));
             setActiveCharacter(updatedChar);
             if (handler > 0) clearTimeout(handler);
 
             handler = setTimeout(() => {
-                updateCharacter(activeCharacter, {name: updatedChar.name});
-            }, 200);
+                updateCharacter(activeCharacter, { name: updatedChar.name });
+            }, 500);
         }
     }
 
-    if (sourcebooks.length == 0) return (<div ref={containerRef}></div>);
+    if (!forgeSteelLoaded) return (<div ref={containerRef}></div>);
 
     if (!activeCharacter) {
         return (
@@ -91,7 +134,7 @@ export function CharacterSheet({ sourcebooks }: CharacterSheetViewProps) {
                     </div>
                     {/* Tabs */}
                     <div className="sticky top-0 flex border-b border-slate-600 bg-slate-750 flex-shrink-0">
-                        {['stats', 'standard abilities', 'character abilities', 'ancestries'].map(tab => (
+                        {['tracking', 'features', 'class abilities'].map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -107,10 +150,9 @@ export function CharacterSheet({ sourcebooks }: CharacterSheetViewProps) {
                 </div>
                 <div className="mb-2">
                     <div className="flex h-full flex-1 p-2 min-w-130 no-scrollbar scrollable-list overflow-y-auto">
-                        {activeTab == "stats" && <CharacterStats hero={fullHero} isOwner={false} onUpdate={onUpdate} />}
-                        {activeTab == "character abilities" && <CharacterAbilities hero={fullHero} />}
-                        {activeTab == "standard abilities" && <StandardAbilities hero={fullHero} />}
-                        {activeTab == "ancestries" && <AncestryView hero={fullHero} />}
+                        {activeTab == "tracking" && <CharacterStats hero={fullHero} isOwner={false} onUpdate={onUpdate} />}
+                        {activeTab == "class abilities" && <CharacterAbilities hero={fullHero} />}
+                        {activeTab == "features" && <Features hero={fullHero} />}
                     </div>
                 </div>
             </div>

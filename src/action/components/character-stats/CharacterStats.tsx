@@ -1,13 +1,13 @@
 import { Hero, Characteristic } from 'forgesteel';
 import { HeroLite } from "@/models/hero-lite";
-import CounterTracker from "../common/CounterTracker";
+import { CounterTracker } from "../controls/CounterTracker";
 import parseNumber from "@/utils/input";
 import { Heart, Minus, Plus, RotateCcw } from "lucide-react";
-import SmartNumericInput from "../common/SmartNumericInput";
-import InputBackground from "../common/InputBackground";
+import SmartNumericInput from "../controls/SmartNumericInput";
+import InputBackground from "@/components/common/InputBackground";
 
 interface SheetHeaderProps {
-    hero?: Hero;
+    hero: Hero;
     isOwner: boolean;
     onUpdate: (update: Partial<HeroLite>) => void;
 }

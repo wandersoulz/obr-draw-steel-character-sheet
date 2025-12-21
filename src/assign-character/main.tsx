@@ -1,13 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@/action/index.css";
-import { AssignCharacterView } from "./AssignCharacter";
-import OBR from "@owlbear-rodeo/sdk";
+import { AssignCharacterView } from "./assign-character";
 
-OBR.onReady(() => {
-  createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-      <AssignCharacterView />
-    </StrictMode>,
-  );
-});
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <AssignCharacterView />
+  </StrictMode>,
+);

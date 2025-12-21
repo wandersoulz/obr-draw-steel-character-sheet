@@ -1,32 +1,63 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { PlayerView } from "./player-view";
-import { CharacterSheet } from "./character-sheet";
-import GMView from "./gm-view";
+import { PlayerView } from "./views/player-view";
+import { CharacterSheet } from "./views/character-sheet";
+import GMView from "./views/gm-view";
 import { useEffect, useState } from "react";
-import { ActiveSourcebooks, SourcebookInterface } from "forgesteel";
-import OBR from "@owlbear-rodeo/sdk";
+import { ActiveSourcebooks } from "forgesteel";
+import OBR, { Item } from "@owlbear-rodeo/sdk";
 import { OBRContext } from "../context/obr-context";
 import { useObr } from "../hooks/useObr";
+import { usePlayer } from "@/hooks/usePlayer";
+import { METADATA_KEYS } from "@/constants";
 
 
 export default function App() {
-  const { isOBRReady, isSceneReady} = useObr();
-  const [playerRole, setPlayerRole] = useState<"GM" | "PLAYER">("PLAYER");
+  const obrState = useObr();
+  const { characters, updateCharacter } = usePlayer();
+  const [playerRole, setPlayerRole] = useState<"GM" | "PLAYER">();
+  const [prevItems, setPrevItems] = useState<Item[]>([]);
+  const [forgeSteelLoaded, setForgeSteelLoaded] = useState<boolean>(false)
 
   useEffect(() => {
-    if (isOBRReady) {
-      OBR.player.getRole().then((role) => {
-        setPlayerRole(role);
+    if (!obrState.isOBRReady) return;
+    OBR.player.getRole().then((role) => {
+      setPlayerRole(role);
+    });
+    OBR.action.setWidth(700);
+  }, [obrState]);
+
+  useEffect(() => {
+    if (!obrState.isOBRReady || !obrState.isSceneReady) return;
+    OBR.scene.items.getItems().then(setPrevItems);
+  }, [obrState]);
+
+  useEffect(() => {
+    if (!obrState.isOBRReady || !obrState.isSceneReady) return;
+    // Set up listener to handle token deletions or character unassignment
+    const unsubscribe = OBR.scene.items.onChange((items) => {
+      const itemSet = new Set(items.map(item => item.id));
+      const deletedItems = prevItems.filter(item => !itemSet.has(item.id));
+      deletedItems.forEach((item) => {
+        const character = characters.find((c) => item.id == c.tokenId);
+        if (!character) return;
+        updateCharacter(character, {tokenId: ""});
       });
-      OBR.action.setWidth(700);
-    }
-  }, [isOBRReady]);
+      items.forEach((item) => {
+        const character = characters.find((c) => item.id == c.tokenId);
+        if (!character) return;
+        if (!item.metadata[METADATA_KEYS.CHARACTER_DATA]) {
+           updateCharacter(character, {tokenId: ""});
+        }
+      });
+      setPrevItems(items);
+    });
+    return unsubscribe;
+  }, [prevItems, characters]);
 
-  const [sourcebooks, setSourcebooks] = useState<SourcebookInterface[]>([])
   useEffect(() => {
-    ActiveSourcebooks.getInstance().getSourcebooks().then((sourcebooks) => {
-      setSourcebooks(sourcebooks);
+    ActiveSourcebooks.getInstance().getSourcebooks().then(() => {
+      setForgeSteelLoaded(true);
     });
   }, []);
 
@@ -36,14 +67,11 @@ export default function App() {
   }
 
   return (
-    <OBRContext value={{
-      isOBRReady,
-      isSceneReady,
-    }}>
+    <OBRContext value={obrState}>
       <HashRouter>
         <Routes>
-          <Route path="/" element={<View sourcebooks={sourcebooks} />} />
-          <Route path="/character/:characterId" element={<CharacterSheet sourcebooks={sourcebooks} />} />
+          <Route path="/" element={<View forgeSteelLoaded={forgeSteelLoaded} />} />
+          <Route path="/character/:characterId" element={<CharacterSheet playerRole={playerRole} forgeSteelLoaded={forgeSteelLoaded} />} />
         </Routes>
       </HashRouter>
     </OBRContext>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AbilitySheetInterface } from 'forgesteel';
-import { DrawSteelSymbolText } from '@/components/ability/ds-symbol-text-component';
-import { Markdown } from '@/components/controls/markdown/markdown';
+import { DrawSteelSymbolText } from '@/action/components/abilities/ability/ds-symbol-text-component';
+import { Markdown } from '@/action/components/controls/markdown/markdown';
 
 import distanceIcon from '@/assets/icons/distance.svg';
 import rollT1 from '@/assets/icons/power-roll-t1.svg';

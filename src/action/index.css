@@ -16,14 +16,6 @@
   --foreground-secondary: rgba(0, 0, 0, 0.6);
 }
 
-.dark {
-  --accent: #bb99ff;
-  --accent-foreground: #350c69;
-  --foreground: var(--color-white);
-  --foreground-inverse: var(--color-black);
-  --foreground-secondary: rgba(255, 255, 255, 0.7);
-}
-
 @theme inline {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);

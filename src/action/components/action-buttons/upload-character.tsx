@@ -1,14 +1,18 @@
 import InputBackground from "@/components/common/InputBackground";
-import { usePlayer } from "@/hooks/usePlayer";
+import { HeroLite } from "@/models/hero-lite";
 import { Hero } from "forgesteel";
 import { ChangeEvent, useRef } from "react";
 
-export function UploadCharacter() {
-    const { addCharacter } = usePlayer();
+interface UploadCharacterProps {
+    onUpload: (character: Hero | HeroLite) => void;
+}
+
+export function UploadCharacter({ onUpload }: UploadCharacterProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleDivClick = () => {
-        inputRef.current?.click();
+        inputRef.current!.value = "";
+        inputRef.current!.click();
     };
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +25,7 @@ export function UploadCharacter() {
             reader.onload = (e: ProgressEvent<FileReader>) => {
                 const content = e.target?.result as string;
                 const hero = new Hero(JSON.parse(content) as Hero);
-                addCharacter(hero);
+                onUpload(hero);
             };
 
             reader.readAsText(file);
@@ -31,7 +35,7 @@ export function UploadCharacter() {
     return (
         <div className="p-2 flex-shrink">
             <InputBackground color="BLUE" className="rounded-full items-center">
-                <div onClick={() => handleDivClick()} className="w-full cursor-pointer p-1 flex items-center justify-center text-sm hover:bg-sky-500 transition-colors text-slate-300">
+                <div onClick={() => handleDivClick()} className="w-full cursor-pointer p-1 flex items-center justify-center text-sm hover:bg-sky-500 transition-colors text-white">
                     Upload Character
                 </div>
             </InputBackground>

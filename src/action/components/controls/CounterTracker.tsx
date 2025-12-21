@@ -1,6 +1,6 @@
 import { cn } from "@/utils/className";
 import SmartNumericInput from "./SmartNumericInput";
-import InputBackground from "./InputBackground";
+import InputBackground from "@/components/common/InputBackground";
 import { Minus, Plus } from "lucide-react";
 
 interface CounterTrackerProps {
@@ -12,7 +12,7 @@ interface CounterTrackerProps {
     label: string;
 }
 
-export default function CounterTracker({
+export function CounterTracker({
     parentValue,
     color = "DEFAULT",
     updateHandler,
