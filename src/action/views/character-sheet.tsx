@@ -24,13 +24,13 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const navigate = useNavigate();
     const containerRef = useAutoResizer();
     const [isCurrentPlayer, setIsCurrentPlayer] = useState<boolean>(true);
-    const { characters, updateCharacter } = usePlayer();
+    const { characters, getCharacters, updateCharacter } = usePlayer();
     const updatePlayerCharacter = usePlayerStore((state) => state.updateCharacter);
     const { playerCharacters, setPlayerCharacters } = useGmStore();
 
     useEffect(() => {
         if (forgeSteelLoaded && (!activeCharacter || activeCharacter.id != characterId)) {
-            const character = characters.find(c => c.id === characterId);
+            const character = getCharacters().find(c => c.id === characterId);
             if (character) setActiveCharacter(character);
             else {
                 if (playerRole == "PLAYER") throw new Error("Chosen character not found");
@@ -60,25 +60,25 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     }, []);
 
     const onUpdate = (partialCharacter: Partial<HeroLite>) => {
-        if (activeCharacter) {
-            const currCharacter = characters.find((c) => c.id == activeCharacter.id) || activeCharacter;
-            const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
-            setActiveCharacter(updatedChar);
-            if (isCurrentPlayer) updateCharacter(currCharacter, partialCharacter);
-            else {
-                const newPlayerCharacters = Object.fromEntries(Object.entries(playerCharacters).map(([playerId, characters]) => {
-                    const foundCharacter = characters.find((character) => character.id == activeCharacter.id)
-                    if (foundCharacter) {
-                        return [
-                            playerId,
-                            characters.map((character) => character.id == foundCharacter.id ? foundCharacter : character)
-                        ];
-                    }
-                    return [playerId, characters];
-                }));
+        if (!activeCharacter) return;
 
-                setPlayerCharacters(newPlayerCharacters);
-            }
+        const currCharacter = getCharacters().find((c) => c.id == activeCharacter.id) || activeCharacter;
+        const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
+        setActiveCharacter(updatedChar);
+        if (isCurrentPlayer) updateCharacter(currCharacter, partialCharacter);
+        else {
+            const newPlayerCharacters = Object.fromEntries(Object.entries(playerCharacters).map(([playerId, characters]) => {
+                const foundCharacter = characters.find((character) => character.id == activeCharacter.id)
+                if (foundCharacter) {
+                    return [
+                        playerId,
+                        characters.map((character) => character.id == foundCharacter.id ? foundCharacter : character)
+                    ];
+                }
+                return [playerId, characters];
+            }));
+
+            setPlayerCharacters(newPlayerCharacters);
         }
     };
 

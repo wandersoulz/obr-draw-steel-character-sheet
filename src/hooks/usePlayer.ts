@@ -9,6 +9,7 @@ export function usePlayer() {
   const addPlayerCharacter = usePlayerStore((state) => state.addCharacter);
   const updatePlayerCharacter = usePlayerStore((state) => state.updateCharacter);
   const removePlayerCharacter = usePlayerStore((state) => state.removePlayerCharacter);
+  const getCharacters = usePlayerStore((state) => state.getCharacters);
 
   const addCharacter = (newCharacter: Hero | HeroLite) => {
     if (newCharacter instanceof Hero)
@@ -40,7 +41,7 @@ export function usePlayer() {
     }
     // Update the player's metadata with the current character changes
     OBR.player.getMetadata().then((metadata) => {
-      const characters = metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[];
+      const characters = metadata[METADATA_KEYS.CHARACTER_DATA] ? metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[] : [];
       const updatedCharacters = characters.map((character) => character.id == updatedCharacter.id ? updatedCharacter : character);
       OBR.player.setMetadata({ [METADATA_KEYS.CHARACTER_DATA]: updatedCharacters });
     });
@@ -68,5 +69,6 @@ export function usePlayer() {
     updateCharacter,
     addCharacter,
     removeCharacter,
+    getCharacters,
   };
 }
