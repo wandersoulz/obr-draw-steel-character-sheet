@@ -11,12 +11,25 @@ export const obrPlayer = <T extends PlayerState>(
     let previousItems: Item[] = [];
     OBR.scene.items.onChange(async (items) => {
       const { characters } = get();
-      const uniqueItemIds = new Set(items.map((i) => i.id));
+      // Removing character(s) from token
+      const prevItemsWithCharacter = previousItems.filter((i) => !!i.metadata[METADATA_KEYS.CHARACTER_DATA]);
+      const currentItemsWithCharacter = items.filter((i) => !!i.metadata[METADATA_KEYS.CHARACTER_DATA]);
+      if (prevItemsWithCharacter.length != currentItemsWithCharacter.length) {
+        const uniqueCurrentItems = new Set(currentItemsWithCharacter.map((i) => i.id))
+        const removedCharacters = new Set(prevItemsWithCharacter.filter((item) => !uniqueCurrentItems.has(item.id)).map((item) => item.id));
+        const removedCharactersToUpdate = characters.filter((c) => removedCharacters.has(c.tokenId));
+        removedCharactersToUpdate.forEach((c) => { c.tokenId = "" });
+      }
+      
+      // Deleted token(s) from scene
       if (previousItems.length != items.length) {
+        const uniqueItemIds = new Set(items.map((i) => i.id));
         const deletedItems = new Set(previousItems.filter((item) => !uniqueItemIds.has(item.id)).map((item) => item.id));
         const deletedCharacterTokens = characters.filter((c) => deletedItems.has(c.tokenId));
         deletedCharacterTokens.forEach((c) => { c.tokenId = "" });
       }
+
+      // Handle updating the underlying store and player metadata
       const itemsWithCharacter = items.filter((i) => !!i.metadata[METADATA_KEYS.CHARACTER_DATA]).map((i) => i.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite);
       const updatedCharacters = characters
         .map((c) => {
