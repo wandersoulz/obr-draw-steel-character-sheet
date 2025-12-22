@@ -5,6 +5,7 @@ import parseNumber from "@/utils/input";
 import { Heart, Minus, Plus, RotateCcw } from "lucide-react";
 import SmartNumericInput from "../controls/SmartNumericInput";
 import InputBackground from "@/components/common/InputBackground";
+import { useMemo } from 'react';
 
 interface SheetHeaderProps {
     hero: Hero;
@@ -19,6 +20,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
     const windedThreshold = hero.getWindedThreshold();
     const maxRecoveries = hero.getRecoveries();
     const recoveryValue = hero.getRecoveryValue();
+    const heroicResourceName = useMemo(() => hero.getHeroicResources()[0].name, []);
 
     const counters = {
         "Surges": hero.state.surges,
@@ -26,17 +28,21 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
         "XP": hero.state.xp,
         "Renown": hero.state.renown,
         "Victories": hero.state.victories,
-        [hero.getHeroicResources()[0].name]: 0
+        [heroicResourceName]: HeroLite.fromHero(hero).heroicResourceValue,
     }
 
     const getOnStateValueChange = (stateFieldName: string) => {
         return (newValue: number) => {
-            onUpdate({
-                state: {
-                    ...hero.state,
-                    [stateFieldName]: newValue,
-                }
-            });
+            if (stateFieldName == heroicResourceName.toLowerCase()) {
+                onUpdate({ heroicResourceValue: newValue });
+            } else {
+                onUpdate({
+                    state: {
+                        ...hero.state,
+                        [stateFieldName]: newValue,
+                    }
+                });
+            }
         }
     };
 
@@ -108,7 +114,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                             }}
                                             className="h-8 w-8 flex items-center justify-center hover:bg-red-900 transition-colors flex-shrink-0"
                                         >
-                                            <Plus size={14} strokeWidth={3.0}/>
+                                            <Plus size={14} strokeWidth={3.0} />
                                         </button>
                                     </InputBackground>
                                 </div>
@@ -156,7 +162,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                         className={`w-7 h-7 flex items-center justify-center rounded ${hero.state.staminaDamage != 0 && hero.state.recoveriesUsed != maxRecoveries
                                             ? 'bg-blue-600 hover:bg-blue-500'
                                             : 'bg-slate-600 cursor-not-allowed opacity-50'
-                                        }`}
+                                            }`}
                                     >
                                         <Heart size={12} />
                                     </button>
@@ -187,7 +193,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                 <div className="flex-1 bg-slate-700 rounded-lg p-2">
                     <h2 className="text-sm font-semibold text-amber-400 mb-2">Skills</h2>
                     <div className="flex flex-row flex-wrap">
-                        {hero.getSkills().map(skill => 
+                        {hero.getSkills().map(skill =>
                             <div key={skill.name} className="flex m-1">
                                 <InputBackground color={"DEFAULT"}><div className="p-2">{skill.name}</div></InputBackground>
                             </div>

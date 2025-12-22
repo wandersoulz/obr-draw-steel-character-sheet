@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { HeroLite } from '@/models/hero-lite';
+import { obrPlayer } from '@/middleware/obr-player';
+import { persist } from 'zustand/middleware';
 
-interface PlayerState {
+export interface PlayerState {
   characters: HeroLite[];
   getCharacters: () => HeroLite[];
   addCharacter: (character: HeroLite) => void;
@@ -11,7 +12,7 @@ interface PlayerState {
 }
 
 export const usePlayerStore = create<PlayerState>()(
-  persist(
+  persist(obrPlayer(
     (set, get) => ({
       characters: [],
       getCharacters: () => get().characters.map(HeroLite.fromHeroLiteInterface),
@@ -29,9 +30,6 @@ export const usePlayerStore = create<PlayerState>()(
           const characters = state.characters.map((c) => (c.id === character.id ? null : c)).filter(c => c != null);
           return { characters }
         }),
-    }),
-    {
-      name: 'draw-steel-player-storage',
-    }
-  )
+    })
+  ), { name: "draw-steel-characters" })
 );

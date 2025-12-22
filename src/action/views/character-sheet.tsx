@@ -8,9 +8,6 @@ import { usePlayer } from "../../hooks/usePlayer";
 import { useGmStore } from "@/stores/gmStore";
 import { CharacterAbilities } from "../components/abilities/character-abilities";
 import { Features } from "../components/features/features";
-import OBR from "@owlbear-rodeo/sdk";
-import { METADATA_KEYS } from "@/constants";
-import { usePlayerStore } from "@/stores/playerStore";
 
 interface CharacterSheetProps {
     forgeSteelLoaded: boolean;
@@ -24,8 +21,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const navigate = useNavigate();
     const containerRef = useAutoResizer();
     const [isCurrentPlayer, setIsCurrentPlayer] = useState<boolean>(true);
-    const { characters, getCharacters, updateCharacter } = usePlayer();
-    const updatePlayerCharacter = usePlayerStore((state) => state.updateCharacter);
+    const { getCharacters, updateCharacter } = usePlayer();
     const { playerCharacters, setPlayerCharacters } = useGmStore();
 
     useEffect(() => {
@@ -41,28 +37,13 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                 setIsCurrentPlayer(false);
             }
         }
-    }, [characters, forgeSteelLoaded]);
-
-    useEffect(() => {
-        const unsubscribe = OBR.scene.items.onChange((items) => {
-            if (activeCharacter) {
-                const tokenCharacters = items
-                    .filter((item) => item.metadata[METADATA_KEYS.CHARACTER_DATA])
-                    .map((item) => item.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite);
-                const character = tokenCharacters.find((char) => char.id == activeCharacter.id);
-                if (character) {
-                    updatePlayerCharacter(character);
-                    setActiveCharacter(character);
-                }
-            }
-        });
-        return () => unsubscribe();
-    }, []);
+    }, [forgeSteelLoaded]);
 
     const onUpdate = (partialCharacter: Partial<HeroLite>) => {
         if (!activeCharacter) return;
 
-        const currCharacter = getCharacters().find((c) => c.id == activeCharacter.id) || activeCharacter;
+        const currCharacter = getCharacters().find((c) => c.id == activeCharacter.id)
+        if (!currCharacter) throw new Error("Cannot find character in store");
         const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
         setActiveCharacter(updatedChar);
         if (isCurrentPlayer) updateCharacter(currCharacter, partialCharacter);

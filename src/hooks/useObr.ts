@@ -14,19 +14,19 @@ export function useObr(): OBRContextState {
         if (!isOBRReady) {
             OBR.onReady(() => {
                 setIsObrReady(true);
-                //OBR.room.setMetadata({ [METADATA_KEYS.CHARACTER_DATA]: [] });
             });
         } else {
             setIsObrReady(true);
-            //OBR.room.setMetadata({ [METADATA_KEYS.CHARACTER_DATA]: [] });
         }
     }, []);
 
     useEffect(() => {
         if (!isOBRReady) return;
+        
+        let unsubscribeScene: () => void;
         OBR.scene.isReady().then((isSceneReady) => {
             if (!isSceneReady) {
-                OBR.scene.onReadyChange((isReady) => {
+                unsubscribeScene = OBR.scene.onReadyChange((isReady) => {
                     if (!isReady) return;
                     setIsSceneReady(true);
                 });
@@ -40,11 +40,18 @@ export function useObr(): OBRContextState {
             }
         });
 
-        OBR.room.onMetadataChange((metadata) => {
+        const unsubscribeRoomMetadata = OBR.room.onMetadataChange((metadata) => {
             if (metadata[METADATA_KEYS.CHARACTER_DATA]) {
                 setRoomCharacters((metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[]).map(HeroLite.fromHeroLiteInterface));
             }
         });
+
+        return () => {
+            if (unsubscribeScene) {
+                unsubscribeScene();
+            }
+            unsubscribeRoomMetadata();
+        }
     }, [isOBRReady]);
 
     return {

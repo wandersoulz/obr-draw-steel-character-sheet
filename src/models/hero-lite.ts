@@ -1,4 +1,4 @@
-import { AbilityCustomizationInterface, Hero, HeroInterface, HeroStateInterface } from 'forgesteel';
+import { AbilityCustomizationInterface, FeatureType, Hero, HeroInterface, HeroStateInterface } from 'forgesteel';
 import { AncestryLite } from './ancestry-lite';
 import { AncestryConverter } from '@/conversion/ancestry-converter';
 import { CultureConverter } from '@/conversion/culture-converter';
@@ -15,6 +15,7 @@ export class HeroLite {
     id: string;
     name: string;
     tokenId: string;
+    heroicResourceValue: number;
 
     ancestry: AncestryLite;
     culture: CultureLite;
@@ -41,6 +42,7 @@ export class HeroLite {
         features: FeatureInterface[],
         abilityCustomizations: AbilityCustomizationInterface[],
         state: HeroStateInterface,
+        heroicResourceValue: number,
     ) {
         this.id = id;
         this.name = name;
@@ -54,6 +56,7 @@ export class HeroLite {
         this.features = features;
         this.abilityCustomizations = abilityCustomizations;
         this.state = state;
+        this.heroicResourceValue = heroicResourceValue;
     }
 
     copyOf(): HeroLite {
@@ -70,6 +73,7 @@ export class HeroLite {
             this.features,
             this.abilityCustomizations,
             this.state,
+            this.heroicResourceValue,
         );
     }
 
@@ -87,6 +91,7 @@ export class HeroLite {
             interfaceValue.features,
             interfaceValue.abilityCustomizations,
             interfaceValue.state,
+            interfaceValue.heroicResourceValue,
         );
     }
 
@@ -119,6 +124,7 @@ export class HeroLite {
             hero.features,
             hero.abilityCustomizations,
             hero.state,
+            hero.getFeatures().map(f => f.feature).filter(f => f.type === FeatureType.HeroicResource).find(f => f.data.type === 'heroic')?.data.value || 0
         );
     }
 
@@ -138,8 +144,12 @@ export class HeroLite {
             settingIDs: [],
             abilityCustomizations: []
         };
+        const hero = new Hero(heroConfig);
+        hero.getFeatures().map(f => f.feature).filter(f => f.type === FeatureType.HeroicResource).forEach(f => {
+			f.data.value = this.heroicResourceValue || 0;
+		});
         
-        return new Hero(heroConfig);
+        return hero;
     }
 
     public getAncestry() {

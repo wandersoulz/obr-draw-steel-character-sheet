@@ -98,7 +98,7 @@ async function createContextMenuItems() {
         icons: [
             {
                 icon: icon,
-                label: "Remove Assigned Character",
+                label: "Remove Character",
                 filter: {
                     every: [
                         { key: "layer", value: "CHARACTER" },
