@@ -47,15 +47,15 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
     };
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
             {/* Characteristics */}
             <div className="bg-slate-700 rounded-lg p-2 flex-shrink-0">
-                <h2 className="text-sm font-semibold text-amber-400 mb-2">Characteristics</h2>
-                <div className="flex gap-3 justify-around">
+                <h2 className="text-sm font-semibold text-amber-400 mb-1">Characteristics</h2>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                     {Object.keys(Characteristic).map((chacteristic) => (
                         <div key={chacteristic} className="flex flex-col items-center">
-                            <span className="text-xs capitalize text-slate-400 mb-1">{chacteristic}</span>
-                            <div className="bg-slate-800 rounded w-12 h-12 flex items-center justify-center">
+                            <span className="text-xs capitalize text-slate-400 mb-0.5">{chacteristic}</span>
+                            <div className="bg-slate-800 rounded px-3 flex items-center justify-center">
                                 <span className="text-lg font-bold text-slate-200">
                                     {hero.class!.characteristics.find((characteristicAssignment) => {
                                         return characteristicAssignment.characteristic == chacteristic;
@@ -67,11 +67,11 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                 </div>
             </div>
 
-            <div className="flex gap-3 flex-1">
+            <div className="flex flex-col md:flex-row gap-1 flex-1">
                 {/* Left Column - Health */}
-                <div className="flex-1 gap-3">
+                <div className="flex-1 gap-1">
                     <div className="bg-slate-700 rounded-lg p-2">
-                        <h2 className="text-sm font-semibold text-amber-400 mb-2">Health</h2>
+                        <h2 className="text-sm font-semibold text-amber-400 mb-1">Health</h2>
                         <div className="bg-slate-800 rounded p-2 mb-2">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs text-slate-300">Stamina</span>
@@ -174,28 +174,28 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
 
                 {/* Right Column - Trackers */}
                 <div className="flex-1 bg-slate-700 rounded-lg p-2">
-                    <h2 className="text-sm font-semibold text-amber-400 mb-2">Trackers</h2>
-                    <div className="grid grid-cols-3 gap-2">
+                    <h2 className="text-sm font-semibold text-amber-400 mb-1">Trackers</h2>
+                    <div className="grid grid-cols-3 gap-1">
                         {Object.entries(counters).map(([key, value]) => (
-                            <CounterTracker
-                                key={key}
-                                label={key}
-                                parentValue={value}
-                                incrementHandler={() => getOnStateValueChange(key.toLowerCase())(value + 1)}
-                                decrementHandler={() => getOnStateValueChange(key.toLowerCase())(value - 1)}
-                                updateHandler={(target) => getOnStateValueChange(key.toLowerCase())(parseNumber(target.value, { min: -999, max: 999, truncate: true, inlineMath: { previousValue: value } }))}
-                            />
+                                <CounterTracker
+                                    key={key}
+                                    label={key}
+                                    parentValue={value}
+                                    incrementHandler={() => getOnStateValueChange(key.toLowerCase())(value + 1)}
+                                    decrementHandler={() => getOnStateValueChange(key.toLowerCase())(value - 1)}
+                                    updateHandler={(target) => getOnStateValueChange(key.toLowerCase())(parseNumber(target.value, { min: -999, max: 999, truncate: true, inlineMath: { previousValue: value } }))}
+                                />
                         ))}
                     </div>
                 </div>
             </div>
-            <div className="bg-slate-700 rounded-lg p-2 flex-shrink-0 mb-2">
-                <div className="flex-1 bg-slate-700 rounded-lg p-2">
-                    <h2 className="text-sm font-semibold text-amber-400 mb-2">Skills</h2>
+            <div className="bg-slate-700 rounded-lg p-1 flex-shrink-0 mb-2">
+                <div className="flex-1 bg-slate-700 rounded-lg p-1">
+                    <h2 className="text-sm font-semibold text-amber-400 mb-1">Skills</h2>
                     <div className="flex flex-row flex-wrap">
                         {hero.getSkills().map(skill =>
                             <div key={skill.name} className="flex m-1">
-                                <InputBackground color={"DEFAULT"}><div className="p-2">{skill.name}</div></InputBackground>
+                                <InputBackground color={"DEFAULT"}><div className="p-1.5 text-sm">{skill.name}</div></InputBackground>
                             </div>
                         )}
                     </div>

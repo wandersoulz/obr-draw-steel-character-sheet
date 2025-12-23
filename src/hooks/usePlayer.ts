@@ -1,9 +1,11 @@
 import { usePlayerStore } from '@/stores/playerStore';
 import { Hero } from 'forgesteel';
 import { HeroLite } from '@/models/hero-lite';
+import { useMemo } from 'react';
 
 export function usePlayer() {
-  const characters = usePlayerStore((state) => state.characters);
+  const storeCharacters = usePlayerStore((state) => state.characters);
+  const characters = useMemo(() => storeCharacters.map(HeroLite.fromHeroLiteInterface), [storeCharacters]);
   const addPlayerCharacter = usePlayerStore((state) => state.addCharacter);
   const updatePlayerCharacter = usePlayerStore((state) => state.updateCharacter);
   const removePlayerCharacter = usePlayerStore((state) => state.removePlayerCharacter);
@@ -30,7 +32,7 @@ export function usePlayer() {
   };
 
   return {
-    characters: characters.map(HeroLite.fromHeroLiteInterface),
+    characters,
     updateCharacter,
     addCharacter,
     removeCharacter,

@@ -1,4 +1,3 @@
-import OBR from "@owlbear-rodeo/sdk";
 import { useContext, useEffect, useState } from "react";
 import { Player } from "@owlbear-rodeo/sdk";
 import { usePlayer } from "../../hooks/usePlayer";
@@ -11,7 +10,6 @@ import { RotateCcw } from "lucide-react";
 import parseNumber from "../../utils/input";
 import { OBRContext } from "@/context/obr-context";
 import { UploadCharacter } from "../components/action-buttons/upload-character";
-import { METADATA_KEYS } from "@/constants";
 import { CharacterList } from "@/components/character/character-list";
 import { useNavigate } from "react-router-dom";
 
@@ -21,34 +19,11 @@ interface GMViewProps {
 
 export default function GMView({ forgeSteelLoaded }: GMViewProps) {
   const navigate = useNavigate();
-  const { isOBRReady, roomCharacters } = useContext(OBRContext);
-  const { malice, playerCharacters, incrementMalice, decrementMalice, setMalice, setPlayerCharacters } = useGmStore();
+  const { roomCharacters } = useContext(OBRContext);
+  const { malice, players, playerCharacters, incrementMalice, decrementMalice, setMalice } = useGmStore();
   const { characters, addCharacter } = usePlayer();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const containerRef = useAutoResizer();
-  const [players, setPlayers] = useState<Player[]>([]);
-
-  useEffect(() => {
-    if (!isOBRReady) return;
-    OBR.party.getPlayers().then((players) => {
-      const allPlayerCharacters = Object.fromEntries(players.map((player) => {
-        return [player.id, player.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[] || []];
-      }).filter(metadata => metadata[1].length == 0));
-      setPlayerCharacters(allPlayerCharacters);
-      setPlayers(players);
-    });
-
-    const unsubscribeParty = OBR.party.onChange((players) => {
-      const allPlayerCharacters = Object.fromEntries(players.map((player) => {
-        return [player.id, player.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[] || []];
-      }).filter(metadata => metadata[1].length == 0));
-      setPlayerCharacters(allPlayerCharacters);
-      setPlayers(players);
-    });
-    return () => {
-      unsubscribeParty();
-    }
-  }, [isOBRReady]);
 
   useEffect(() => {
   }, [characters, forgeSteelLoaded]);
@@ -121,7 +96,7 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
             {selectedPlayer &&
               <div className="md:w-1/3 flex flex-col border-r border-slate-700 pr-2">
                 <h2 className="text-md font-bold mb-1 text-center">{selectedPlayer.name}'s Characters</h2>
-                {playerCharacters && playerCharacters[selectedPlayer.id] &&
+                {playerCharacters && playerCharacters[selectedPlayer.id] && playerCharacters[selectedPlayer.id].length > 0 &&
                   <CharacterList onCharacterClick={(character) => navigate(`/character/${character.id}`)} characters={playerCharacters[selectedPlayer.id].filter((character) => character.tokenId != "")} />
                 }
               </div>

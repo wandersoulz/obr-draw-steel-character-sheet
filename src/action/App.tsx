@@ -8,11 +8,13 @@ import { ActiveSourcebooks } from "forgesteel";
 import OBR from "@owlbear-rodeo/sdk";
 import { OBRContext } from "../context/obr-context";
 import { useObr } from "../hooks/useObr";
+import { useAutoResizer } from "../hooks/useAutoResizer";
 
 export default function App() {
   const obrState = useObr();
   const [playerRole, setPlayerRole] = useState<"GM" | "PLAYER">();
   const [forgeSteelLoaded, setForgeSteelLoaded] = useState<boolean>(false)
+  const containerRef = useAutoResizer();
 
   useEffect(() => {
     if (!obrState.isOBRReady) return;
@@ -36,10 +38,12 @@ export default function App() {
   return (
     <OBRContext value={obrState}>
       <HashRouter>
-        <Routes>
-          <Route path="/" element={<View forgeSteelLoaded={forgeSteelLoaded} />} />
-          <Route path="/character/:characterId" element={<CharacterSheet playerRole={playerRole} forgeSteelLoaded={forgeSteelLoaded} />} />
-        </Routes>
+        <div ref={containerRef}>
+          <Routes>
+            <Route path="/" element={<View forgeSteelLoaded={forgeSteelLoaded} />} />
+            <Route path="/character/:characterId" element={<CharacterSheet playerRole={playerRole} forgeSteelLoaded={forgeSteelLoaded} />} />
+          </Routes>
+        </div>
       </HashRouter>
     </OBRContext>
   );

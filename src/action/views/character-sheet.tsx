@@ -1,13 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import CharacterStats from "../components/character-stats/CharacterStats";
 import { HeroLite } from "../../models/hero-lite";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { ArrowLeft } from 'lucide-react';
-import { useAutoResizer } from "../../hooks/useAutoResizer";
 import { usePlayer } from "../../hooks/usePlayer";
-import { useGmStore } from "@/stores/gmStore";
 import { CharacterAbilities } from "../components/abilities/character-abilities";
 import { Features } from "../components/features/features";
+import { useGm } from "@/hooks/useGm";
 
 interface CharacterSheetProps {
     forgeSteelLoaded: boolean;
@@ -19,46 +18,59 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const [activeCharacter, setActiveCharacter] = useState<HeroLite>();
     const { characterId } = useParams<{ characterId: string }>();
     const navigate = useNavigate();
-    const containerRef = useAutoResizer();
-    const [isCurrentPlayer, setIsCurrentPlayer] = useState<boolean>(true);
-    const { getCharacters, updateCharacter } = usePlayer();
-    const { playerCharacters, setPlayerCharacters } = useGmStore();
+    const sheetRef = useRef<HTMLDivElement>(null);
+    const { characters, getCharacters, updateCharacter } = usePlayer();
+    const { playerCharacters, getPlayerCharacters, setPlayerCharacters } = useGm();
 
     useEffect(() => {
-        if (forgeSteelLoaded && (!activeCharacter || activeCharacter.id != characterId)) {
+        if (forgeSteelLoaded) {
             const character = getCharacters().find(c => c.id === characterId);
             if (character) setActiveCharacter(character);
             else {
                 if (playerRole == "PLAYER") throw new Error("Chosen character not found");
 
-                const character = Object.values(playerCharacters).flat().find((hero: HeroLite) => hero.id == characterId);
+                const character = Object.values(getPlayerCharacters()).flat().find((hero: HeroLite) => hero.id == characterId);
                 if (!character) throw new Error("Chosen character cannot be found among players");
                 setActiveCharacter(character);
-                setIsCurrentPlayer(false);
             }
         }
     }, [forgeSteelLoaded]);
 
+    useEffect(() => {
+        const character = characters.find(c => c.id === characterId);
+        if (character) setActiveCharacter(character);
+        else {
+            if (playerRole == "PLAYER") throw new Error("Chosen character not found");
+
+            const character = Object.values(getPlayerCharacters()).flat().find((hero: HeroLite) => hero.id == characterId);
+            if (!character) throw new Error("Chosen character cannot be found among players");
+            setActiveCharacter(character);
+        }
+    }, [characters, playerCharacters]);
+
     const onUpdate = (partialCharacter: Partial<HeroLite>) => {
         if (!activeCharacter) return;
 
-        const currCharacter = getCharacters().find((c) => c.id == activeCharacter.id)
-        if (!currCharacter) throw new Error("Cannot find character in store");
-        const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
-        setActiveCharacter(updatedChar);
-        if (isCurrentPlayer) updateCharacter(currCharacter, partialCharacter);
+        let currCharacter = getCharacters().find((c) => c.id == activeCharacter.id)
+        if (currCharacter) {
+            const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
+            setActiveCharacter(updatedChar);
+            updateCharacter(currCharacter, partialCharacter);
+        }
         else {
-            const newPlayerCharacters = Object.fromEntries(Object.entries(playerCharacters).map(([playerId, characters]) => {
-                const foundCharacter = characters.find((character) => character.id == activeCharacter.id)
-                if (foundCharacter) {
+
+            const newPlayerCharacters = Object.fromEntries(Object.entries(getPlayerCharacters()).map(([playerId, characters]) => {
+                const currCharacter = characters.find((character) => character.id == activeCharacter.id);
+                if (currCharacter) {
+                    const updatedChar: HeroLite = Object.assign(currCharacter, partialCharacter);
+                    setActiveCharacter(currCharacter);
                     return [
                         playerId,
-                        characters.map((character) => character.id == foundCharacter.id ? foundCharacter : character)
+                        characters.map((character) => character.id == updatedChar.id ? updatedChar : character)
                     ];
                 }
                 return [playerId, characters];
             }));
-
             setPlayerCharacters(newPlayerCharacters);
         }
     };
@@ -76,11 +88,11 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
         }
     }
 
-    if (!forgeSteelLoaded) return (<div ref={containerRef}></div>);
+    if (!forgeSteelLoaded) return (<div></div>);
 
     if (!activeCharacter) {
         return (
-            <div ref={containerRef} className="h-screen w-full bg-slate-900 text-white flex flex-col items-center justify-center p-6">
+            <div className="h-screen w-full bg-slate-900 text-white flex flex-col items-center justify-center p-6">
                 <h2 className="text-2xl font-bold mb-4">Character Not Found</h2>
             </div>
         );
@@ -91,8 +103,8 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const ancestry = fullHero.ancestry?.name;
     const className = fullHero.class?.name;
     return (
-        <div ref={containerRef} className="no-scrollbar bg-slate-900 text-slate-100 flex items-center justify-center">
-            <div className="w-full bg-slate-800 rounded-lg shadow-xl flex flex-col">
+        <div ref={sheetRef} className="bg-slate-900 text-slate-100 flex items-center justify-center h-screen md:min-h-119">
+            <div className="w-full bg-slate-800 rounded-lg shadow-xl flex flex-col h-full">
                 <div className="sticky top-0">
                     {/* Header */}
                     <div className="z-30 bg-slate-700 px-3 py-2 border-b border-slate-600 flex items-center justify-between flex-shrink-0 rounded-2xl">
@@ -129,8 +141,8 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                         ))}
                     </div>
                 </div>
-                <div className="mb-2">
-                    <div className="flex h-full flex-1 p-2 min-w-130 no-scrollbar scrollable-list overflow-y-auto">
+                <div className="flex-1 flex flex-col no-scrollbar scrollable-list overflow-y-auto">
+                    <div className="flex flex-col flex-1 p-1">
                         {activeTab == "tracking" && <CharacterStats hero={fullHero} isOwner={false} onUpdate={onUpdate} />}
                         {activeTab == "class abilities" && <CharacterAbilities hero={fullHero} />}
                         {activeTab == "features" && <Features hero={fullHero} />}

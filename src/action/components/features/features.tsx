@@ -1,5 +1,6 @@
 import { FeatureInterface, FeatureLogic, Hero } from "forgesteel";
 import { Markdown } from "../controls/markdown/markdown";
+import { HeroicResourceFeature } from "./heroic-resource";
 
 interface FeaturesProps {
     hero: Hero;
@@ -10,6 +11,8 @@ export function Features({ hero }: FeaturesProps) {
     let features = FeatureLogic.getFeaturesFromClass(hero.class!, heroLevel);
     features = features.concat(hero.ancestry!.getFeatures(heroLevel));
     features = features.concat(FeatureLogic.getFeaturesFromCulture(hero.culture!, heroLevel));
+    features = features.concat(FeatureLogic.getFeaturesFromCustomization(hero));
+    features = features.concat(hero.getItems().map((item) => FeatureLogic.getFeaturesFromItem(item, heroLevel)).flat());
 	
     const featuresBySource = features.reduce((acc, feature) => {
         const source = feature.source;
@@ -24,6 +27,7 @@ export function Features({ hero }: FeaturesProps) {
 
     return (
         <div className="w-full flex flex-col gap-3">
+            <HeroicResourceFeature hero={hero} />
             {Object.entries(featuresBySource).map(([source, features]) => (
                 <div key={source} className="bg-slate-700 rounded-lg p-2">
                     <h2 className="text-sm font-semibold text-amber-400 mb-2">{source}</h2>
