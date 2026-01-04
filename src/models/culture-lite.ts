@@ -1,4 +1,4 @@
-import { FeatureInterface } from "forgesteel";
+import { FeatureInterface } from 'forgesteel';
 
 export interface CultureLite {
     cultureId: string;

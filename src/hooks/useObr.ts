@@ -1,8 +1,8 @@
-import { METADATA_KEYS } from "@/constants";
-import { OBRContextState } from "@/context/obr-context";
-import { HeroLite } from "@/models/hero-lite";
-import OBR from "@owlbear-rodeo/sdk";
-import { useEffect, useState } from "react";
+import { METADATA_KEYS } from '@/constants';
+import { OBRContextState } from '@/context/obr-context';
+import { HeroLite } from '@/models/hero-lite';
+import OBR from '@owlbear-rodeo/sdk';
+import { useEffect, useState } from 'react';
 
 export function useObr(): OBRContextState {
     const [isOBRReady, setIsObrReady] = useState<boolean>(false);
@@ -10,13 +10,13 @@ export function useObr(): OBRContextState {
     const [roomCharacters, setRoomCharacters] = useState<HeroLite[]>([]);
 
     useEffect(() => {
-        let isOBRReady = OBR.isReady;
+        const isOBRReady = OBR.isReady;
         if (!isOBRReady) {
             OBR.onReady(() => {
                 setIsObrReady(true);
             });
         } else {
-            setIsObrReady(true);
+            Promise.resolve().then(() => setIsObrReady(true));
         }
     }, []);
 
@@ -51,7 +51,7 @@ export function useObr(): OBRContextState {
                 unsubscribeScene();
             }
             unsubscribeRoomMetadata();
-        }
+        };
     }, [isOBRReady]);
 
     return {

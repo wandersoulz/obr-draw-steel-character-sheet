@@ -1,42 +1,101 @@
-import { FeatureInterface, FeatureLogic, Hero } from "forgesteel";
-import { Markdown } from "../controls/markdown/markdown";
-import { HeroicResourceFeature } from "./heroic-resource";
+import {
+    ElementInterface,
+    FeatureInterface,
+    FeatureItemChoiceInterface,
+    FeatureLogic,
+    FeatureTitleChoiceInterface,
+    FeatureType,
+    Hero,
+} from 'forgesteel';
+import { HeroicResourceFeature } from './heroic-resource';
+import { ItemFeature } from './item-feature';
+import { TitleFeature } from './title-feature';
+import { Feature } from './feature';
+import { HeroLite } from '@/models/hero-lite';
 
 interface FeaturesProps {
     hero: Hero;
+    updateHero: (partialHero: Partial<HeroLite>) => void;
 }
 
-export function Features({ hero }: FeaturesProps) {
+const groupBySource = (features: { source: string; feature: FeatureInterface }[]) => {
+    return features.reduce(
+        (acc, feature) => {
+            const source = feature.source;
+            if (!acc[source]) {
+                acc[source] = [];
+            }
+            if (feature.feature.description != '') acc[source].push(feature.feature);
+            return acc;
+        },
+        {} as Record<string, FeatureInterface[]>
+    );
+};
+
+export function Features({ hero, updateHero }: FeaturesProps) {
+    const onTitleRemove = (titleName: string) => {
+        const features = hero.features.filter((feature) => feature.name != titleName);
+        updateHero({ features });
+    };
+    const onRemoveItem = (itemName: string) => {
+        const inventory = hero.state.inventory.filter((item) => item.name != itemName);
+        updateHero({ state: { ...hero.state, inventory } });
+    };
     const heroLevel = hero.class!.level;
+    const itemFeatures = groupBySource(
+        hero.state.inventory.map((item) => FeatureLogic.getFeaturesFromItem(item, heroLevel)).flat()
+    );
+    const titleFeatures: Record<string, FeatureTitleChoiceInterface[]> = groupBySource(
+        FeatureLogic.getFeaturesFromCustomization(hero)
+            .filter((feature) => feature.feature.type == FeatureType.TitleChoice)
+            .map((feature) => ({
+                source: feature.source,
+                feature: feature.feature as FeatureTitleChoiceInterface,
+            }))
+    ) as Record<string, FeatureTitleChoiceInterface[]>;
+
     let features = FeatureLogic.getFeaturesFromClass(hero.class!, heroLevel);
     features = features.concat(hero.ancestry!.getFeatures(heroLevel));
     features = features.concat(FeatureLogic.getFeaturesFromCulture(hero.culture!, heroLevel));
-    features = features.concat(FeatureLogic.getFeaturesFromCustomization(hero));
-    features = features.concat(hero.getItems().map((item) => FeatureLogic.getFeaturesFromItem(item, heroLevel)).flat());
-	
-    const featuresBySource = features.reduce((acc, feature) => {
-        const source = feature.source;
-        if (!acc[source]) {
-            acc[source] = [];
-        }
-        if (feature.feature.description != "") {
-            acc[source].push(feature.feature);
-        }
-        return acc;
-    }, {} as Record<string, FeatureInterface[]>);
+    features = features.concat(
+        FeatureLogic.getFeaturesFromCustomization(hero).filter(
+            (feature) => feature.feature.type != FeatureType.TitleChoice
+        )
+    );
+    features = features.concat(
+        hero
+            .getItems()
+            .map((item) => FeatureLogic.getFeaturesFromItem(item, heroLevel))
+            .flat()
+    );
+
+    const featuresBySource = groupBySource(features);
 
     return (
         <div className="w-full flex flex-col gap-3">
             <HeroicResourceFeature hero={hero} />
+            {Object.entries(titleFeatures).map(([titleName, features]) => (
+                <TitleFeature
+                    key={titleName}
+                    onRemoveTitleClick={onTitleRemove}
+                    features={features}
+                    titleName={titleName}
+                />
+            ))}
+            {Object.entries(itemFeatures).map(([itemName, features]) => (
+                <ItemFeature
+                    key={itemName}
+                    onRemoveItemClick={onRemoveItem}
+                    itemName={itemName}
+                    features={features}
+                />
+            ))}
             {Object.entries(featuresBySource).map(([source, features]) => (
                 <div key={source} className="bg-slate-700 rounded-lg p-2">
-                    <h2 className="text-sm font-semibold text-amber-400 mb-2">{source}</h2>
-                    <div className="flex gap-3 flex-wrap">
-                        {features.map(feature => (
-                            <div key={feature.id} className="flex flex-col flex-grow bg-slate-800 rounded-lg p-2">
-                                <h3 className="text-sm font-semibold capitalize">{feature.name}</h3>
-                                <div className="mt-1 text-xs text-slate-400"><Markdown text={feature.description} /></div>
-                            </div>
+                    <h2 className="text-md font-semibold text-indigo-200 mb-2">{source}</h2>
+                    <div className="flex flex-col gap-3 flex-wrap">
+                        {features.map((feature) => (
+                            <Feature key={feature.id} feature={feature} />
                         ))}
                     </div>
                 </div>

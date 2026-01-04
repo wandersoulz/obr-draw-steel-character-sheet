@@ -12,24 +12,24 @@ export interface PlayerState {
 }
 
 export const usePlayerStore = create<PlayerState>()(
-  persist(obrPlayer(
-    (set, get) => ({
-      characters: [],
-      getCharacters: () => get().characters.map(HeroLite.fromHeroLiteInterface),
-      addCharacter: (character) => set((state) => {
-        const characters = [...state.characters, character];
-        return { characters }
-      }),
-      updateCharacter: (character) =>
-        set((state) => {
-          const characters = state.characters.map((c) => (c.id === character.id ? character : c));
-          return { characters }
-        }),
-      removePlayerCharacter: (character) =>
-        set((state) => {
-          const characters = state.characters.map((c) => (c.id === character.id ? null : c)).filter(c => c != null);
-          return { characters }
-        }),
-    })
-  ), { name: "draw-steel-characters" })
+    persist(obrPlayer(
+        (set, get) => ({
+            characters: [],
+            getCharacters: () => get().characters.map(HeroLite.fromHeroLiteInterface),
+            addCharacter: (character) => set((state) => {
+                const characters = [...state.characters, character];
+                return { characters };
+            }),
+            updateCharacter: (character) =>
+                set((state) => {
+                    const characters = state.characters.map((c) => (c.id === character.id ? character : c));
+                    return { characters };
+                }),
+            removePlayerCharacter: (character) =>
+                set((state) => {
+                    const characters = state.characters.map((c) => (c.id === character.id ? null : c)).filter(c => c != null);
+                    return { characters };
+                }),
+        })
+    ), { name: 'draw-steel-characters' })
 );

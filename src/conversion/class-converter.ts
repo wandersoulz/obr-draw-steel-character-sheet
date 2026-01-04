@@ -86,7 +86,7 @@ export class ClassConverter {
         return lite;
     }
 
-    static toClass(classLite: ClassLite): HeroClassInterface | null{
+    static toClass(classLite: ClassLite): HeroClassInterface | null {
         const activeSourcebooks = ActiveSourcebooks.getInstance();
         const classes = activeSourcebooks.getClasses();
 

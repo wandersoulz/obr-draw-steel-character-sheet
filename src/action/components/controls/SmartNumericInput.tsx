@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 interface SmartNumericInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     value: string;
     onUpdate: (target: HTMLInputElement) => void;
     className: string;
-    ref?: React.Ref<HTMLInputElement>;
     clearContentOnFocus?: boolean;
 }
 
@@ -12,7 +11,6 @@ export default function SmartNumericInput({
     value,
     onUpdate,
     className,
-    ref,
     clearContentOnFocus,
     ...inputProps
 }: SmartNumericInputProps) {
@@ -27,7 +25,7 @@ export default function SmartNumericInput({
         setInputContentUpdateFlag(false);
     }
 
-    useEffect(() => {setInputContentUpdateFlag(true)}, [value]);
+    useEffect(() => {setInputContentUpdateFlag(true);}, [value]);
 
     const resetInputContent = () => setInputContent(value);
 
@@ -51,7 +49,6 @@ export default function SmartNumericInput({
     return (
         <input
             {...inputProps}
-            ref={ref}
             value ={inputContent}
             onChange={(e) => {
                 if (inputProps.onChange) inputProps.onChange(e);
@@ -60,28 +57,28 @@ export default function SmartNumericInput({
             onBlur={(e) => {
                 if (inputProps.onBlur) inputProps.onBlur(e);
                 if (!ignoreBlur) {
-                    if (clearContentOnFocus && inputContent === "") resetInputContent();
+                    if (clearContentOnFocus && inputContent === '') resetInputContent();
                     else runOnConfirm(e);
                 }
             }}
             onKeyDown={(e) => {
                 if (inputProps.onKeyDown) inputProps.onKeyDown(e);
-                if (e.key === "Enter") {
+                if (e.key === 'Enter') {
                     blurWithoutUpdate(e);
                     runOnConfirm(e);
-                } else if (e.key === "Escape") {
+                } else if (e.key === 'Escape') {
                     blurWithoutUpdate(e);
                     resetInputContent();
                 }
             }}
             onFocus={(e) => {
                 if (inputProps.onFocus) inputProps.onFocus(e);
-                if (clearContentOnFocus) setInputContent("");
+                if (clearContentOnFocus) setInputContent('');
             }}
             className={className}
             autoComplete="off"
             spellCheck="false"
             maxLength={3}
         />
-    )
+    );
 }

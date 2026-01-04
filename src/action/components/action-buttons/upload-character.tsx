@@ -1,7 +1,7 @@
-import InputBackground from "@/components/common/InputBackground";
-import { HeroLite } from "@/models/hero-lite";
-import { Hero } from "forgesteel";
-import { ChangeEvent, useRef } from "react";
+import InputBackground from '@/components/common/InputBackground';
+import { HeroLite } from '@/models/hero-lite';
+import { Hero } from 'forgesteel';
+import { ChangeEvent, useRef } from 'react';
 
 interface UploadCharacterProps {
     onUpload: (character: Hero | HeroLite) => void;
@@ -11,7 +11,7 @@ export function UploadCharacter({ onUpload }: UploadCharacterProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleDivClick = () => {
-        inputRef.current!.value = "";
+        inputRef.current!.value = '';
         inputRef.current!.click();
     };
 
@@ -47,5 +47,5 @@ export function UploadCharacter({ onUpload }: UploadCharacterProps) {
                 style={{ display: 'none' }}
             />
         </div>
-    )
+    );
 }

@@ -29,7 +29,7 @@ export function AbilityCard({ ability, heroicResourceName }: Props) {
                         <h2 className="text-md text-amber-400 font-bold mr-1">{ability.name}</h2>
                         {ability.cost > 0 && (
                             <div className="text-md font-bold text-amber-500">
-                                ({ability.cost + " " + heroicResourceName})
+                                ({ability.cost + ' ' + heroicResourceName})
                             </div>
                         )}
                     </div>

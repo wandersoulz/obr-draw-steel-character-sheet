@@ -9,18 +9,18 @@ interface MarkdownProps {
 const showdownConverter = new showdown.Converter();
 
 export const Markdown = (props: MarkdownProps) => {
-	if (!props.text) {
-		return null;
-	}
+    if (!props.text) {
+        return null;
+    }
 
-	return (
-		<div>
-			{
-				props.useSpan ?
-					<span className={props.className} dangerouslySetInnerHTML={{ __html: showdownConverter.makeHtml(props.text.trim()) }} />
-					:
-					<div className={props.className} dangerouslySetInnerHTML={{ __html: showdownConverter.makeHtml(props.text.trim()) }} />
-			}
-		</div>
-	);
+    return (
+        <div>
+            {
+                props.useSpan ?
+                    <span className={props.className} dangerouslySetInnerHTML={{ __html: showdownConverter.makeHtml(props.text.trim()) }} />
+                    :
+                    <div className={props.className} dangerouslySetInnerHTML={{ __html: showdownConverter.makeHtml(props.text.trim()) }} />
+            }
+        </div>
+    );
 };

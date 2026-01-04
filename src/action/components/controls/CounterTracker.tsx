@@ -1,7 +1,7 @@
-import { cn } from "@/utils/className";
-import SmartNumericInput from "./SmartNumericInput";
-import InputBackground from "@/components/common/InputBackground";
-import { Minus, Plus } from "lucide-react";
+import { cn } from '@/utils/className';
+import SmartNumericInput from './SmartNumericInput';
+import InputBackground from '@/components/common/InputBackground';
+import { Minus, Plus } from 'lucide-react';
 
 interface CounterTrackerProps {
     parentValue: number;
@@ -14,7 +14,7 @@ interface CounterTrackerProps {
 
 export function CounterTracker({
     parentValue,
-    color = "DEFAULT",
+    color = 'DEFAULT',
     updateHandler,
     incrementHandler,
     decrementHandler,
@@ -34,7 +34,7 @@ export function CounterTracker({
                     value={parentValue.toString()}
                     onUpdate={updateHandler}
                     clearContentOnFocus
-                    className={cn("flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none")}
+                    className={cn('flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none')}
                 />
                 <button 
                     className="h-8 w-8 flex items-center justify-center hover:bg-slate-500 transition-colors text-slate-300"
@@ -44,5 +44,5 @@ export function CounterTracker({
                 </button>
             </InputBackground>
         </div>
-    )
+    );
 }

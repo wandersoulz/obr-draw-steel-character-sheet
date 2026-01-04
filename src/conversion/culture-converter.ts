@@ -10,7 +10,7 @@ export class CultureConverter {
             selectedEnvironment: culture.environment,
             selectedOrganization: culture.organization,
             selectedUpbringing: culture.upbringing,
-        }
+        };
     }
 
     static toCulture(cultureLite: CultureLite): CultureInterface {
@@ -32,7 +32,7 @@ export class CultureConverter {
         }
 
         const specificCulture = Object.assign({}, rootCulture);
-        if (!specificCulture) throw new Error("Could not find culture");
+        if (!specificCulture) throw new Error('Could not find culture');
 
         specificCulture.name = cultureLite.cultureName;
         (specificCulture.language as FeatureLanguageChoiceInterface).data.selected = cultureLite.selectedLanguage;

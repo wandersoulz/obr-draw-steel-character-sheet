@@ -8,7 +8,7 @@ import { OverlayState } from '@/models/overlay-state';
 const OVERLAY_VERTICAL_OFFSET = 38;
 
 const icon = new URL(
-    "/icon.svg#icon",
+    '/icon.svg#icon',
     import.meta.url,
 ).toString();
 
@@ -34,7 +34,7 @@ async function updateOverLays(tokens: Record<string, OverlayState>, dpi: number,
             x: origin.x,
             y: origin.y,
         };
-        overlays.push(createNameTag(item, dpi, overlayState.name, nameTagPosition, "UP"));        
+        overlays.push(createNameTag(item, dpi, overlayState.name, nameTagPosition, 'UP'));        
         // Add back anything that wasn't from a removed token
         if (!tokensRemoved.has(item.id)) {
             await OBR.scene.local.addItems(overlays);
@@ -56,60 +56,60 @@ function getTokensFromItems(items: Item[]): Record<string, OverlayState> {
                     stamina: character.maxStamina - character.state.staminaDamage,
                     name: character.name,
                 }
-            ]
+            ];
         });
     return Object.fromEntries(characters);
 }
 
 async function createContextMenuItems() {
     await OBR.contextMenu.create({
-        id: "assign-character",
+        id: 'assign-character',
         icons: [
             {
                 icon: icon,
-                label: "Assign Character",
+                label: 'Assign Character',
                 filter: {
                     every: [
-                        { key: "layer", value: "CHARACTER" },
+                        { key: 'layer', value: 'CHARACTER' },
                         {
-                            key: ["metadata", METADATA_KEYS.CHARACTER_DATA],
+                            key: ['metadata', METADATA_KEYS.CHARACTER_DATA],
                             value: undefined,
-                            operator: "==",
+                            operator: '==',
                         },
                     ],
-                    permissions: ["UPDATE"],
-                    roles: ["PLAYER", "GM"],
+                    permissions: ['UPDATE'],
+                    roles: ['PLAYER', 'GM'],
                     max: 1,
                 },
             },
         ],
         onClick: (context, _) => {
             OBR.popover.open({
-                "id": "select-character",
-                "height": 400,
-                "width": 300,
-                "url": `/assignCharacter.html?tokenId=${context.items[0].id}`
+                'id': 'select-character',
+                'height': 400,
+                'width': 300,
+                'url': `/assignCharacter.html?tokenId=${context.items[0].id}`
             });
         }
     });
 
     await OBR.contextMenu.create({
-        id: "remove-assigned-character",
+        id: 'remove-assigned-character',
         icons: [
             {
                 icon: icon,
-                label: "Remove Character",
+                label: 'Remove Character',
                 filter: {
                     every: [
-                        { key: "layer", value: "CHARACTER" },
+                        { key: 'layer', value: 'CHARACTER' },
                         {
-                            key: ["metadata", METADATA_KEYS.CHARACTER_DATA],
+                            key: ['metadata', METADATA_KEYS.CHARACTER_DATA],
                             value: undefined,
-                            operator: "!=",
+                            operator: '!=',
                         },
                     ],
-                    permissions: ["UPDATE"],
-                    roles: ["PLAYER", "GM"],
+                    permissions: ['UPDATE'],
+                    roles: ['PLAYER', 'GM'],
                     max: 1,
                 },
             },
@@ -147,7 +147,7 @@ async function initBackground() {
 
 // Start the background task once OBR and scene are ready.
 OBR.onReady(async () => {
-    const isReady = await OBR.scene.isReady()
+    const isReady = await OBR.scene.isReady();
     if (!isReady) {
         OBR.scene.onReadyChange(async (isNowReady) => {
             if (!isNowReady) return;

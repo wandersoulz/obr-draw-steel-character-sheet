@@ -1,21 +1,21 @@
-import { CharacterList } from "@/components/character/character-list";
-import { useObr } from "@/hooks/useObr";
-import { usePlayer } from "@/hooks/usePlayer";
-import { HeroLite } from "@/models/hero-lite";
-import OBR from "@owlbear-rodeo/sdk";
-import { ActiveSourcebooks, SourcebookInterface } from "forgesteel";
-import { useEffect, useMemo, useState } from "react";
+import { CharacterList } from '@/components/character/character-list';
+import { useObr } from '@/hooks/useObr';
+import { usePlayer } from '@/hooks/usePlayer';
+import { HeroLite } from '@/models/hero-lite';
+import OBR from '@owlbear-rodeo/sdk';
+import { ActiveSourcebooks, SourcebookInterface } from 'forgesteel';
+import { useEffect, useMemo, useState } from 'react';
 
 function useQuery() {
     return useMemo<URLSearchParams>(() => new URLSearchParams(window.location.search), []);
 }
 
 export function AssignCharacterView() {
-    const [sourcebooks, setSourcebooks] = useState<SourcebookInterface[]>([])
+    const [sourcebooks, setSourcebooks] = useState<SourcebookInterface[]>([]);
     const { isOBRReady, isSceneReady } = useObr();
     const { characters, updateCharacter } = usePlayer();
     const searchParams = useQuery();
-    const tokenId = searchParams.get("tokenId");
+    const tokenId = searchParams.get('tokenId');
 
     const isReady = characters && isOBRReady && isSceneReady && sourcebooks;
 
@@ -34,14 +34,14 @@ export function AssignCharacterView() {
 
         await OBR.popover.close('select-character');
         await OBR.player.deselect();
-    }
+    };
 
     if (!isReady) {
         return (
             <div>Loading...</div>
-        )
+        );
     }
-    const filteredCharacters = characters.filter((character) => !character.tokenId || character.tokenId == "");
+    const filteredCharacters = characters.filter((character) => !character.tokenId || character.tokenId == '');
 
     return (
         <div className="bg-slate-900 text-slate-100 flex flex-col">
@@ -55,5 +55,5 @@ export function AssignCharacterView() {
                 }
             </div>
         </div>
-    )
+    );
 }

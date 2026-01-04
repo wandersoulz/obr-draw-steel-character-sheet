@@ -1,7 +1,7 @@
-import { OBRContext } from "@/context/obr-context";
-import { usePlayer } from "@/hooks/usePlayer";
-import { HeroLite } from "@/models/hero-lite";
-import { useContext } from "react";
+import { OBRContext } from '@/context/obr-context';
+import { usePlayer } from '@/hooks/usePlayer';
+import { HeroLite } from '@/models/hero-lite';
+import { useContext } from 'react';
 
 interface DeleteCharacterProps {
     character: HeroLite;
@@ -18,7 +18,7 @@ export function DeleteCharacter({ character }: DeleteCharacterProps) {
         else {
             removeCharacter(character);
         }
-    }
+    };
 
     return (
         <button
@@ -27,5 +27,5 @@ export function DeleteCharacter({ character }: DeleteCharacterProps) {
         >
             Delete
         </button>
-    )
+    );
 }

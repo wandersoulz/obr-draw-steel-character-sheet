@@ -1,7 +1,7 @@
-import { OBRContext } from "@/context/obr-context";
-import { HeroLite } from "@/models/hero-lite";
-import { CoreUtils } from "forgesteel";
-import { useContext } from "react";
+import { OBRContext } from '@/context/obr-context';
+import { HeroLite } from '@/models/hero-lite';
+import { CoreUtils } from 'forgesteel';
+import { useContext } from 'react';
 
 interface ShareCharacterProps {
     character: HeroLite;
@@ -15,9 +15,9 @@ export function ShareCharacter({ character }: ShareCharacterProps) {
         newHero.takeRespite();
         const newCharacter = HeroLite.fromHero(newHero);
         newCharacter.id = CoreUtils.guid();
-        newCharacter.tokenId = "";
+        newCharacter.tokenId = '';
         addCharacterToRoom(newCharacter);
-    }
+    };
 
     return (
         <button
@@ -26,5 +26,5 @@ export function ShareCharacter({ character }: ShareCharacterProps) {
         >   
             Share
         </button>
-    )
+    );
 }

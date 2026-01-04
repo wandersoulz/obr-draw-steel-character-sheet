@@ -1,10 +1,10 @@
 import { Hero, Characteristic } from 'forgesteel';
-import { HeroLite } from "@/models/hero-lite";
-import { CounterTracker } from "../controls/CounterTracker";
-import parseNumber from "@/utils/input";
-import { Heart, Minus, Plus, RotateCcw } from "lucide-react";
-import SmartNumericInput from "../controls/SmartNumericInput";
-import InputBackground from "@/components/common/InputBackground";
+import { HeroLite } from '@/models/hero-lite';
+import { CounterTracker } from '../controls/CounterTracker';
+import parseNumber from '@/utils/input';
+import { Heart, Minus, Plus, RotateCcw } from 'lucide-react';
+import SmartNumericInput from '../controls/SmartNumericInput';
+import InputBackground from '@/components/common/InputBackground';
 import { useMemo } from 'react';
 
 interface SheetHeaderProps {
@@ -14,22 +14,20 @@ interface SheetHeaderProps {
 }
 
 export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
-    if (!hero) return <div></div>;
-
     const maxStamina = hero.getStamina();
     const windedThreshold = hero.getWindedThreshold();
     const maxRecoveries = hero.getRecoveries();
     const recoveryValue = hero.getRecoveryValue();
-    const heroicResourceName = useMemo(() => hero.getHeroicResources()[0].name, []);
+    const heroicResourceName = useMemo(() => hero.getHeroicResources()[0].name, [hero]);
 
     const counters = {
-        "Surges": hero.state.surges,
-        "Wealth": hero.state.wealth,
-        "XP": hero.state.xp,
-        "Renown": hero.state.renown,
-        "Victories": hero.state.victories,
+        'Surges': hero.state.surges,
+        'Wealth': hero.state.wealth,
+        'XP': hero.state.xp,
+        'Renown': hero.state.renown,
+        'Victories': hero.state.victories,
         [heroicResourceName]: HeroLite.fromHero(hero).heroicResourceValue,
-    }
+    };
 
     const getOnStateValueChange = (stateFieldName: string) => {
         return (newValue: number) => {
@@ -43,8 +41,10 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                     }
                 });
             }
-        }
+        };
     };
+
+    if (!hero) return <div></div>;
 
     return (
         <div className="flex flex-col gap-1">
@@ -80,8 +80,8 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                         <button
                                             onClick={() => {
                                                 if (hero.state.staminaDamage === maxStamina + windedThreshold)
-                                                    return
-                                                getOnStateValueChange("staminaDamage")(Math.min(maxStamina + windedThreshold, hero.state.staminaDamage + 1))
+                                                    return;
+                                                getOnStateValueChange('staminaDamage')(Math.min(maxStamina + windedThreshold, hero.state.staminaDamage + 1));
                                             }}
                                             className="h-8 w-8 flex items-center justify-center hover:bg-red-900 transition-colors text-slate-300"
                                         >
@@ -91,16 +91,16 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                             <SmartNumericInput
                                                 value={(maxStamina - hero.state.staminaDamage).toString()}
                                                 onUpdate={(target) => {
-                                                    let newValue = parseNumber(target.value, {
+                                                    const newValue = parseNumber(target.value, {
                                                         max: maxStamina,
                                                         min: -windedThreshold,
                                                         inlineMath: { previousValue: maxStamina - hero.state.staminaDamage }
                                                     });
-                                                    getOnStateValueChange("staminaDamage")(maxStamina - newValue);
+                                                    getOnStateValueChange('staminaDamage')(maxStamina - newValue);
                                                 }}
                                                 clearContentOnFocus
                                                 className={
-                                                    "w-7 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none flex-shrink-0"
+                                                    'w-7 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none flex-shrink-0'
                                                 }
                                             />
                                             <span className="text-slate-400 mx-0.5 text-sm">/</span>
@@ -109,8 +109,8 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                         <button
                                             onClick={() => {
                                                 if (hero.state.staminaDamage === 0)
-                                                    return
-                                                getOnStateValueChange("staminaDamage")(hero.state.staminaDamage - 1)
+                                                    return;
+                                                getOnStateValueChange('staminaDamage')(hero.state.staminaDamage - 1);
                                             }}
                                             className="h-8 w-8 flex items-center justify-center hover:bg-red-900 transition-colors flex-shrink-0"
                                         >
@@ -141,7 +141,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                             });
                                         }}
                                         disabled={hero.state.recoveriesUsed == 0}
-                                        className={"w-7 h-7 flex items-center justify-center rounded bg-green-600 hover:bg-green-500"}
+                                        className={'w-7 h-7 flex items-center justify-center rounded bg-green-600 hover:bg-green-500'}
                                     >
                                         <RotateCcw size={12} />
                                     </button>
@@ -153,8 +153,8 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                             onUpdate({
                                                 state: {
                                                     ...hero.state,
-                                                    "recoveriesUsed": hero.state.recoveriesUsed + 1,
-                                                    "staminaDamage": Math.max(0, hero.state.staminaDamage - recoveryValue),
+                                                    'recoveriesUsed': hero.state.recoveriesUsed + 1,
+                                                    'staminaDamage': Math.max(0, hero.state.staminaDamage - recoveryValue),
                                                 }
                                             });
                                         }}
@@ -162,7 +162,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                                         className={`w-7 h-7 flex items-center justify-center rounded ${hero.state.staminaDamage != 0 && hero.state.recoveriesUsed != maxRecoveries
                                             ? 'bg-blue-600 hover:bg-blue-500'
                                             : 'bg-slate-600 cursor-not-allowed opacity-50'
-                                            }`}
+                                        }`}
                                     >
                                         <Heart size={12} />
                                     </button>
@@ -177,14 +177,14 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                     <h2 className="text-sm font-semibold text-amber-400 mb-1">Trackers</h2>
                     <div className="grid grid-cols-3 gap-1">
                         {Object.entries(counters).map(([key, value]) => (
-                                <CounterTracker
-                                    key={key}
-                                    label={key}
-                                    parentValue={value}
-                                    incrementHandler={() => getOnStateValueChange(key.toLowerCase())(value + 1)}
-                                    decrementHandler={() => getOnStateValueChange(key.toLowerCase())(value - 1)}
-                                    updateHandler={(target) => getOnStateValueChange(key.toLowerCase())(parseNumber(target.value, { min: -999, max: 999, truncate: true, inlineMath: { previousValue: value } }))}
-                                />
+                            <CounterTracker
+                                key={key}
+                                label={key}
+                                parentValue={value}
+                                incrementHandler={() => getOnStateValueChange(key.toLowerCase())(value + 1)}
+                                decrementHandler={() => getOnStateValueChange(key.toLowerCase())(value - 1)}
+                                updateHandler={(target) => getOnStateValueChange(key.toLowerCase())(parseNumber(target.value, { min: -999, max: 999, truncate: true, inlineMath: { previousValue: value } }))}
+                            />
                         ))}
                     </div>
                 </div>
@@ -195,7 +195,7 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                     <div className="flex flex-row flex-wrap">
                         {hero.getSkills().map(skill =>
                             <div key={skill.name} className="flex m-1">
-                                <InputBackground color={"DEFAULT"}><div className="p-1.5 text-sm">{skill.name}</div></InputBackground>
+                                <InputBackground color={'DEFAULT'}><div className="p-1.5 text-sm">{skill.name}</div></InputBackground>
                             </div>
                         )}
                     </div>

@@ -1,4 +1,4 @@
-import { HeroLite } from "@/models/hero-lite";
+import { HeroLite } from '@/models/hero-lite';
 
 interface CharacterNameProps {
     name: string;
@@ -22,7 +22,7 @@ export default function CharacterName({ name, isGM, isOwner, onUpdate }: Charact
                     Character Name
                 </div>
             </div>
-                {isGM || isOwner ? <input className="w-32 font-bold col-start-1 row-start-1 h-full w-full bg-transparent text-center outline-hidden focus:border-b-2 focus:outline-none focus:border-blue-500" value={name} onChange={handleInputChange} /> : <h2 className="text-md font-bold">{name}</h2>}
+            {isGM || isOwner ? <input className="w-32 font-bold col-start-1 row-start-1 h-full w-full bg-transparent text-center outline-hidden focus:border-b-2 focus:outline-none focus:border-blue-500" value={name} onChange={handleInputChange} /> : <h2 className="text-md font-bold">{name}</h2>}
         </div>
     );
 }

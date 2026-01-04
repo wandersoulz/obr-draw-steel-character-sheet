@@ -146,8 +146,8 @@ export class HeroLite {
         };
         const hero = new Hero(heroConfig);
         hero.getFeatures().map(f => f.feature).filter(f => f.type === FeatureType.HeroicResource).forEach(f => {
-			f.data.value = this.heroicResourceValue || 0;
-		});
+            f.data.value = this.heroicResourceValue || 0;
+        });
         
         return hero;
     }

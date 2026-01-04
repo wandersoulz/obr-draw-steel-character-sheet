@@ -11,7 +11,7 @@ export default function parseNumber(
     let doInlineMath = options?.inlineMath !== undefined;
     if (doInlineMath) {
         string = string.trim();
-        if (string.startsWith("=")) {
+        if (string.startsWith('=')) {
             string = string.substring(1).trim();
             doInlineMath = false;
         }
@@ -23,7 +23,7 @@ export default function parseNumber(
 
     if (doInlineMath &&
         options?.inlineMath &&
-        (string.startsWith("+") || string.startsWith("-"))
+        (string.startsWith('+') || string.startsWith('-'))
     ) {
         newValue = options.inlineMath.previousValue + newValue;
     }
