@@ -1,7 +1,5 @@
 import {
-    ElementInterface,
     FeatureInterface,
-    FeatureItemChoiceInterface,
     FeatureLogic,
     FeatureTitleChoiceInterface,
     FeatureType,
