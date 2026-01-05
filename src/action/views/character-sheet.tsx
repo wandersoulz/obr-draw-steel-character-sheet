@@ -18,6 +18,8 @@ import {
 } from 'forgesteel';
 import { FeatureSelectModal } from '../components/controls/FeatureSelectModal';
 import { useDebounce } from '@/hooks/useDebounce';
+import { DiceRollerModal } from '../components/dice/dice-roller-modal';
+import { useModalStore } from '@/stores/modalStore';
 
 interface CharacterSheetProps {
     forgeSteelLoaded: boolean;
@@ -25,7 +27,6 @@ interface CharacterSheetProps {
 }
 
 export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetProps) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [features, setFeatures] = useState<ElementInterface[]>([]);
     const [activeTab, setActiveTab] = useState('tracking');
     const [activeCharacter, setActiveCharacter] = useState<HeroLite>();
@@ -34,6 +35,10 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const { characters, getCharacters, updateCharacter } = usePlayer();
     const { playerCharacters, getPlayerCharacters, setPlayerCharacters } = useGm();
     const characterName = useDebounce(activeCharacter?.name, 500);
+    const diceRollerModalIsOpen = useModalStore((state) => state.diceRollerModalIsOpen);
+    const featureModalIsOpen = useModalStore((state) => state.featureModalIsOpen);
+    const setFeatureModalIsOpen = useModalStore((state) => state.setFeatureModalIsOpen);
+    const rollAttributes = useModalStore((state) => state.diceRollerAttributes);
 
     useEffect(() => {
         const character = characters.find((character) => character.id == characterId);
@@ -112,7 +117,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
 
     const showFeatureSelectModal = (features: ElementInterface[]) => {
         setFeatures(features);
-        setIsModalOpen(true);
+        setFeatureModalIsOpen(true);
     };
 
     const handleAddItem = () => {
@@ -153,7 +158,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
         const updatedChar: HeroLite = Object.assign(activeCharacter, partialCharacter);
         setActiveCharacter(updatedChar);
         updateCharacter(activeCharacter, partialCharacter);
-        setIsModalOpen(false);
+        setFeatureModalIsOpen(false);
     };
 
     const handleCharacterNameChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -184,65 +189,75 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
         <div className="h-screen w-full bg-slate-900 text-slate-100 flex flex-col overflow-hidden">
             <FeatureSelectModal
                 features={features}
-                isOpen={isModalOpen}
+                isOpen={featureModalIsOpen}
                 handleOnClose={handleOnModalClose}
             />
-            <div className="w-full bg-slate-800 rounded-lg flex flex-col h-full overflow-hidden">
+            <DiceRollerModal
+                hero={activeCharacter}
+                updateHero={onUpdate}
+                isOpen={diceRollerModalIsOpen}
+                initialRollAttributes={rollAttributes}
+            />
+            <div className="w-full bg-slate-800 flex flex-col h-full overflow-hidden">
                 <div className="flex-shrink-0">
                     {/* Header */}
-                    <div className="z-30 bg-slate-700 px-3 py-2 border-b border-slate-600 flex items-center justify-between flex-shrink-0 rounded-2xl">
+                    <header className="bg-slate-900 shadow-lg border-b border-slate-700 px-3 py-2 flex items-center justify-between flex-shrink-0">
                         <button
                             onClick={() => navigate('/')}
-                            className="flex items-center gap-1 text-xs text-slate-300 hover:text-white transition-colors"
+                            className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-white transition-colors"
                         >
-                            <ArrowLeft size={14} />
+                            <ArrowLeft size={16} />
                             Back
                         </button>
 
-                        <div className="text-center flex-1">
+                        <div className="text-center flex-1 mx-4">
                             <input
-                                className="text-base text-center font-bold text-amber-400"
+                                className="w-full text-xl text-center font-bold text-slate-100 bg-transparent outline-none placeholder-slate-600 focus:text-white"
                                 value={activeCharacter.name}
                                 onChange={handleCharacterNameChange}
+                                placeholder="Character Name"
                             />
-                            <p className="text-xs text-slate-300">
+                            <p className="text-xs text-slate-400 mt-0.5 font-medium">
                                 {ancestry} • {className} • Level {level}
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-1 text-xs text-slate-300">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={handleAddItem}
-                                className="hover:text-white transition-colors rounded bg-green-800 hover:bg-green-700 p-1"
+                                className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
                             >
                                 Add Item
                             </button>
                             <button
                                 onClick={handleAddTitle}
-                                className="hover:text-white transition-colors rounded bg-blue-800 hover:bg-blue-700 p-1"
+                                className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
                             >
                                 Add Title
                             </button>
                         </div>
-                    </div>
-                    <div className="flex border-b border-slate-600 bg-slate-750 flex-shrink-0">
+                    </header>
+                    <div className="flex border-b border-slate-700 bg-slate-800 flex-shrink-0">
                         {['tracking', 'features', 'class abilities'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`flex-1 py-1 text-xs font-medium capitalize transition-colors bg-slate-800 ${
+                                className={`flex-1 py-2 text-sm font-medium capitalize transition-all relative ${
                                     activeTab === tab
-                                        ? 'text-amber-400 border-b-2 border-amber-400'
+                                        ? 'text-indigo-400'
                                         : 'text-slate-400 hover:text-slate-200'
                                 }`}
                             >
                                 {tab}
+                                {activeTab === tab && (
+                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-400 rounded-t-full" />
+                                )}
                             </button>
                         ))}
                     </div>
                 </div>
-                <div className="flex-1 flex flex-col no-scrollbar overflow-y-auto">
-                    <div className="flex flex-col flex-1 p-1">
+                <div className="flex-1 flex flex-col no-scrollbar overflow-y-auto bg-slate-900">
+                    <div className="flex flex-col flex-1 p-2 gap-4">
                         {activeTab == 'tracking' && (
                             <CharacterStats hero={fullHero} isOwner={false} onUpdate={onUpdate} />
                         )}

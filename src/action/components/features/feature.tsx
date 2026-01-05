@@ -7,12 +7,12 @@ interface FeatureProps {
 
 export function Feature({ feature }: FeatureProps) {
     return (
-        <div className="flex flex-col text-slate-300 bg-slate-800 p-2 rounded-lg">
-            <h3 className="flex text-sm font-semibold capitalize text-indigo-300">
+        <div className="flex flex-col bg-white border border-gray-200 p-3 rounded-md shadow-sm">
+            <h3 className="flex text-sm font-bold capitalize text-indigo-900 border-b border-gray-100 pb-1 mb-2">
                 {feature.name}
             </h3>
-            <div className="flex mt-1 text-xs">
-                <Markdown text={feature.description} />
+            <div className="flex text-sm text-gray-700">
+                <Markdown text={feature.description} className="prose prose-sm max-w-none text-gray-700" />
             </div>
         </div>
     );

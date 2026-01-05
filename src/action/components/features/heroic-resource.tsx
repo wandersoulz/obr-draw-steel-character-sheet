@@ -9,32 +9,32 @@ export function HeroicResourceFeature({ hero }: HeroicResourceFeatureProps) {
     const heroicResourceGains = [...heroicResource.gains];
 
     return (
-        <div>
-            <div className="bg-slate-700 rounded-lg p-2">
-                <h2 className="text-md font-semibold text-indigo-200 mb-2">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden font-sans">
+            <div className="bg-indigo-900 text-white p-2">
+                <h2 className="text-md font-bold">
                     Gaining: {heroicResource.name}
                 </h2>
-                <div className="flex gap-3 flex-wrap">
-                    {heroicResourceGains.map((gain, index) => (
-                        <div
-                            key={index}
-                            className="flex flex-col flex-grow bg-slate-800 rounded-lg p-2"
-                        >
-                            <div className="mt-1 text-sm font-bold">
-                                <div>
-                                    <span className="text-indigo-300"> Gain:</span>{' '}
-                                    <span className="text-indigo-100">{gain.value}</span>
-                                </div>
-                                <div>
-                                    <span className="text-indigo-300">When: </span>
-                                    <span className="text-xs text-slate-300 font-normal">
-                                        {gain.trigger}
-                                    </span>
-                                </div>
+            </div>
+            <div className="p-3 bg-gray-50 flex flex-col gap-3">
+                {heroicResourceGains.map((gain, index) => (
+                    <div
+                        key={index}
+                        className="flex flex-col bg-white border border-gray-200 rounded-md p-3 shadow-sm"
+                    >
+                        <div className="text-sm">
+                            <div className="mb-1">
+                                <span className="font-bold text-indigo-900">Gain:</span>{' '}
+                                <span className="font-bold text-gray-900">{gain.value}</span>
+                            </div>
+                            <div>
+                                <span className="font-bold text-indigo-900">When: </span>
+                                <span className="text-gray-700">
+                                    {gain.trigger}
+                                </span>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

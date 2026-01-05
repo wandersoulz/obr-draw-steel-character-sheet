@@ -1,5 +1,6 @@
 import { FeatureTitleChoiceInterface } from 'forgesteel';
 import { Feature } from './feature';
+import { X } from 'lucide-react';
 
 interface TitleFeatureProps {
     titleName: string;
@@ -14,20 +15,25 @@ export function TitleFeature({ titleName, features, onRemoveTitleClick }: TitleF
     const titleChoiceFeatures = titleChoice.features;
 
     return (
-        <div className="bg-slate-700 rounded-lg p-2">
-            <div className="flex flex-row">
-                <h2 className="text-md font-semibold text-indigo-200 mb-2">{titleName}</h2>
-                <div
-                    className="bg-indigo-700 hover:bg-indigo-600 rounded-full text-center justify-center pt-1 px-2 text-sm font-semibold text-indigo-200 ml-auto hover:cursor-pointer"
+        <div className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden font-sans">
+            <div className="bg-indigo-900 text-white p-2 flex justify-between items-center">
+                <h2 className="text-md font-bold">{titleName}</h2>
+                <button
+                    className="text-white hover:text-red-200 transition-colors p-1"
                     onClick={() => onRemoveTitleClick(titleName)}
+                    title="Remove Title"
                 >
-                    Remove Title
-                </div>
+                    <X size={16} />
+                </button>
             </div>
-            <p className="text-xs text-white-600 dark:text-gray-400 mb-2">{titleDescription}</p>
-            {titleChoiceFeatures.map((feature) => (
-                <Feature key={feature.id} feature={feature} />
-            ))}
+            <div className="p-3 bg-gray-50 border-b border-gray-200">
+                 <p className="text-sm text-gray-700 italic">{titleDescription}</p>
+            </div>
+            <div className="p-3 bg-gray-100 flex flex-col gap-3">
+                {titleChoiceFeatures.map((feature) => (
+                    <Feature key={feature.id} feature={feature} />
+                ))}
+            </div>
         </div>
     );
 }

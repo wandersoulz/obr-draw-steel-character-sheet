@@ -21,28 +21,28 @@ export function FeatureSelectModal({ isOpen, handleOnClose, features }: FeatureS
     });
 
     return (
-        <div className="fixed inset-0 z-100 bg-black/50 flex items-center justify-center p-10">
-            <div className="w-full max-w-lg bg-slate-800 rounded-lg shadow-xl flex flex-col max-h-full overflow-hidden">
-                <div className="p-2 border-b border-slate-700 bg-slate-800">
+        <div className="fixed inset-0 z-100 bg-black/50 flex items-center justify-center p-10 font-sans">
+            <div className="w-full max-w-lg bg-white rounded-lg shadow-xl flex flex-col max-h-full overflow-hidden border border-gray-300">
+                <div className="p-2 border-b border-gray-200 bg-indigo-900">
                     <input
                         type="text"
-                        className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded p-2 focus:outline-none focus:border-amber-400"
+                        className="w-full bg-indigo-800 border border-indigo-700 text-white placeholder-indigo-300 rounded p-2 focus:outline-none focus:border-indigo-400 focus:bg-indigo-900 transition-colors"
                         placeholder="Search..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         autoFocus
                     />
                 </div>
-                <div className="flex-1 overflow-y-auto p-2 no-scrollbar">
+                <div className="flex-1 overflow-y-auto p-2 no-scrollbar bg-gray-50">
                     {filteredFeatures.map(feature => (
                         <div
                             key={feature.id}
-                            className="p-2 m-1 bg-slate-700 rounded flex justify-between items-center text-slate-100 hover:bg-slate-500 hover:cursor-pointer transition-colors"
+                            className="p-3 m-1 bg-white border border-gray-200 rounded shadow-sm flex justify-between items-center text-gray-900 hover:bg-indigo-50 hover:border-indigo-200 hover:cursor-pointer transition-all"
                             onClick={() => handleOnClose(feature)}
                         >
                             <div className="flex-grow truncate">
-                                <p className="text-sm font-bold truncate">{feature.name}</p>
-                                <p className="text-xs text-slate-300 truncate">{feature.description}</p>
+                                <p className="text-sm font-bold truncate text-indigo-900">{feature.name}</p>
+                                <p className="text-xs text-gray-500 truncate">{feature.description}</p>
                             </div>
                         </div>
                     ))}

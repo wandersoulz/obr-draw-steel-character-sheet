@@ -70,7 +70,7 @@ export function Features({ hero, updateHero }: FeaturesProps) {
     const featuresBySource = groupBySource(features);
 
     return (
-        <div className="w-full flex flex-col gap-3">
+        <div className="w-full flex flex-col gap-3 font-sans">
             <HeroicResourceFeature hero={hero} />
             {Object.entries(titleFeatures).map(([titleName, features]) => (
                 <TitleFeature
@@ -89,14 +89,22 @@ export function Features({ hero, updateHero }: FeaturesProps) {
                 />
             ))}
             {Object.entries(featuresBySource).map(([source, features]) => (
-                <div key={source} className="bg-slate-700 rounded-lg p-2">
-                    <h2 className="text-md font-semibold text-indigo-200 mb-2">{source}</h2>
-                    <div className="flex flex-col gap-3 flex-wrap">
-                        {features.map((feature) => (
-                            <Feature key={feature.id} feature={feature} />
-                        ))}
-                    </div>
-                </div>
+                <>
+                    {features.length == 0 ? (
+                        <></>
+                    ) : (
+                        <div key={source} className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
+                            <div className="bg-indigo-900 text-white p-2">
+                                <h2 className="text-md font-bold">{source}</h2>
+                            </div>
+                            <div className="p-3 bg-gray-100 flex flex-col gap-3">
+                                {features.map((feature) => (
+                                    <Feature key={feature.id} feature={feature} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
             ))}
         </div>
     );

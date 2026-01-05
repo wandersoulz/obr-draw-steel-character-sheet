@@ -1,5 +1,12 @@
-import { Hero, ClassicSheetBuilder, AbilityKeyword, Characteristic, ElementFactory } from 'forgesteel';
+import {
+    Hero,
+    ClassicSheetBuilder,
+    AbilityKeyword,
+    Characteristic,
+    ElementFactory,
+} from 'forgesteel';
 import { AbilityCard } from './ability/AbilityCard';
+import { findCharacteristicsInPowerRoll } from './ability/ds-symbol-text-component';
 
 interface CharacterAbilitiesProps {
     hero: Hero;
@@ -7,16 +14,21 @@ interface CharacterAbilitiesProps {
 
 export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
     if (!hero) return <div></div>;
-    
+
     const heroicResourceName = hero.getHeroicResources()[0].name;
-    const abilities = hero.getAbilities([]).map(a => a.ability);
+    const abilities = hero.getAbilities([]).map((a) => a.ability);
 
     const freeStrikeMelee = ElementFactory.createAbility({
         id: 'free-melee',
         name: 'Free Strike (melee)',
         description: '',
         type: ElementFactory.AbilityTypeFactory.createFreeStrike(),
-        keywords: [AbilityKeyword.Charge, AbilityKeyword.Melee, AbilityKeyword.Strike, AbilityKeyword.Weapon],
+        keywords: [
+            AbilityKeyword.Charge,
+            AbilityKeyword.Melee,
+            AbilityKeyword.Strike,
+            AbilityKeyword.Weapon,
+        ],
         distance: [ElementFactory.DistanceFactory.createMelee()],
         target: 'One creature or object',
         sections: [
@@ -49,11 +61,14 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
                 })
             ),
         ],
-    });    
+    });
 
-    const freeStrikes = [ freeStrikeMelee, freeStrikeRanged ]
-        .map(a => ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined));
-    let abilitySheets = freeStrikes.concat(abilities.map(a => ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined)));
+    const freeStrikes = [freeStrikeMelee, freeStrikeRanged].map((a) =>
+        ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined)
+    );
+    let abilitySheets = freeStrikes.concat(
+        abilities.map((a) => ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined))
+    );
 
     abilitySheets = abilitySheets.filter((ability, index) => {
         return index === abilitySheets.findIndex((t) => t.id === ability.id);
@@ -61,8 +76,19 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
 
     return (
         <div className="flex flex-col gap-3 flex-1 min-h-0 m-2">
-            <div className="flex gap-3 flex-wrap">
-                {abilitySheets.map(ability => <AbilityCard key={ability.id} heroicResourceName={heroicResourceName} ability={ability} />)}
+            <div className="columns-1 md:columns-2 gap-3 space-y-3">
+                {abilitySheets.map((ability) => (
+                    <div key={ability.id} className="break-inside-avoid">
+                        <AbilityCard
+                            characteristicValues={findCharacteristicsInPowerRoll(
+                                hero,
+                                ability.rollPower
+                            )}
+                            heroicResourceName={heroicResourceName}
+                            ability={ability}
+                        />
+                    </div>
+                ))}
             </div>
         </div>
     );

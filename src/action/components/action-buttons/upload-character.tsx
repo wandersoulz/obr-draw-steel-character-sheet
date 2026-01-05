@@ -31,11 +31,14 @@ export function UploadCharacter({ onUpload }: UploadCharacterProps) {
             reader.readAsText(file);
         }
     };
-    
+
     return (
         <div className="p-2 flex-shrink">
-            <InputBackground color="BLUE" className="rounded-full items-center">
-                <div onClick={() => handleDivClick()} className="w-full cursor-pointer p-1 flex items-center justify-center text-sm hover:bg-sky-500 transition-colors text-white">
+            <InputBackground color="VIOLET" className="rounded-full items-center">
+                <div
+                    onClick={() => handleDivClick()}
+                    className="w-full cursor-pointer p-1 flex items-center justify-center text-sm hover:bg-sky-500 transition-colors text-white"
+                >
                     Upload Character
                 </div>
             </InputBackground>

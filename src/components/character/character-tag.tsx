@@ -25,13 +25,12 @@ export function CharacterTag({ character, onClick, canShare = false, canDelete =
     return (
 
         <div
-            key={character.id}
-            className={'p-2 m-1 bg-slate-700 rounded flex justify-between items-center text-slate-100 hover:bg-slate-500 hover:cursor-pointer'}
+            className={'p-3 m-1 bg-white border border-gray-200 rounded-lg shadow-sm flex justify-between items-center text-gray-900 hover:bg-indigo-50 hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer'}
         >
             <div className="flex-grow truncate">
                 <div onClick={() => onClick && onClick(character)}>
-                    <p className="text-sm font-bold truncate">{character.name}</p>
-                    <p className="text-xs text-slate-300 truncate">{getCharacterSubtitle(character)}</p>
+                    <p className="text-sm font-bold truncate text-indigo-900">{character.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{getCharacterSubtitle(character)}</p>
                 </div>
             </div>
             {canShare && (

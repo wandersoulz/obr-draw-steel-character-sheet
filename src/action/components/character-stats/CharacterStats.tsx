@@ -47,16 +47,18 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
     if (!hero) return <div></div>;
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-3 font-sans">
             {/* Characteristics */}
-            <div className="bg-slate-700 rounded-lg p-2 flex-shrink-0">
-                <h2 className="text-sm font-semibold text-amber-400 mb-1">Characteristics</h2>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden flex-shrink-0">
+                <div className="bg-indigo-900 text-white p-2">
+                    <h2 className="text-sm font-bold">Characteristics</h2>
+                </div>
+                <div className="p-2 grid grid-cols-2 md:grid-cols-5 gap-2">
                     {Object.keys(Characteristic).map((chacteristic) => (
                         <div key={chacteristic} className="flex flex-col items-center">
-                            <span className="text-xs capitalize text-slate-400 mb-0.5">{chacteristic}</span>
-                            <div className="bg-slate-800 rounded px-3 flex items-center justify-center">
-                                <span className="text-lg font-bold text-slate-200">
+                            <span className="text-xs capitalize text-gray-500 mb-0.5">{chacteristic}</span>
+                            <div className="bg-gray-100 border border-gray-200 rounded px-3 flex items-center justify-center min-w-[3rem]">
+                                <span className="text-lg font-bold text-gray-900">
                                     {hero.class!.characteristics.find((characteristicAssignment) => {
                                         return characteristicAssignment.characteristic == chacteristic;
                                     })?.value}
@@ -67,115 +69,119 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-1 flex-1">
+            <div className="flex flex-col md:flex-row gap-3 flex-1">
                 {/* Left Column - Health */}
-                <div className="flex-1 gap-1">
-                    <div className="bg-slate-700 rounded-lg p-2">
-                        <h2 className="text-sm font-semibold text-amber-400 mb-1">Health</h2>
-                        <div className="bg-slate-800 rounded p-2 mb-2">
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs text-slate-300">Stamina</span>
-                                <div className="flex items-center gap-1">
-                                    <InputBackground color="RED">
-                                        <button
-                                            onClick={() => {
-                                                if (hero.state.staminaDamage === maxStamina + windedThreshold)
-                                                    return;
-                                                getOnStateValueChange('staminaDamage')(Math.min(maxStamina + windedThreshold, hero.state.staminaDamage + 1));
-                                            }}
-                                            className="h-8 w-8 flex items-center justify-center hover:bg-red-900 transition-colors text-slate-300"
-                                        >
-                                            <Minus size={14} strokeWidth={3.0} />
-                                        </button>
-                                        <div className="flex items-center">
-                                            <SmartNumericInput
-                                                value={(maxStamina - hero.state.staminaDamage).toString()}
-                                                onUpdate={(target) => {
-                                                    const newValue = parseNumber(target.value, {
-                                                        max: maxStamina,
-                                                        min: -windedThreshold,
-                                                        inlineMath: { previousValue: maxStamina - hero.state.staminaDamage }
-                                                    });
-                                                    getOnStateValueChange('staminaDamage')(maxStamina - newValue);
+                <div className="flex-1 gap-3 flex flex-col">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
+                        <div className="bg-indigo-900 text-white p-2">
+                            <h2 className="text-sm font-bold">Health</h2>
+                        </div>
+                        <div className="p-2 space-y-2">
+                            <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-gray-500 uppercase">Stamina</span>
+                                    <div className="flex items-center gap-1">
+                                        <InputBackground color="RED">
+                                            <button
+                                                onClick={() => {
+                                                    if (hero.state.staminaDamage === maxStamina + windedThreshold)
+                                                        return;
+                                                    getOnStateValueChange('staminaDamage')(Math.min(maxStamina + windedThreshold, hero.state.staminaDamage + 1));
                                                 }}
-                                                clearContentOnFocus
-                                                className={
-                                                    'w-7 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none flex-shrink-0'
-                                                }
-                                            />
-                                            <span className="text-slate-400 mx-0.5 text-sm">/</span>
-                                            <span className="w-7 text-center font-bold text-sm text-slate-200">{maxStamina}</span>
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                if (hero.state.staminaDamage === 0)
-                                                    return;
-                                                getOnStateValueChange('staminaDamage')(hero.state.staminaDamage - 1);
-                                            }}
-                                            className="h-8 w-8 flex items-center justify-center hover:bg-red-900 transition-colors flex-shrink-0"
-                                        >
-                                            <Plus size={14} strokeWidth={3.0} />
-                                        </button>
-                                    </InputBackground>
+                                                className="h-8 w-8 flex items-center justify-center hover:bg-red-200 transition-colors text-gray-700"
+                                            >
+                                                <Minus size={14} strokeWidth={3.0} />
+                                            </button>
+                                            <div className="flex items-center">
+                                                <SmartNumericInput
+                                                    value={(maxStamina - hero.state.staminaDamage).toString()}
+                                                    onUpdate={(target) => {
+                                                        const newValue = parseNumber(target.value, {
+                                                            max: maxStamina,
+                                                            min: -windedThreshold,
+                                                            inlineMath: { previousValue: maxStamina - hero.state.staminaDamage }
+                                                        });
+                                                        getOnStateValueChange('staminaDamage')(maxStamina - newValue);
+                                                    }}
+                                                    clearContentOnFocus
+                                                    className={
+                                                        'w-8 h-8 bg-transparent text-center text-sm font-bold text-gray-900 outline-none flex-shrink-0'
+                                                    }
+                                                />
+                                                <span className="text-gray-400 mx-0.5 text-sm">/</span>
+                                                <span className="w-7 text-center font-bold text-sm text-gray-900">{maxStamina}</span>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    if (hero.state.staminaDamage === 0)
+                                                        return;
+                                                    getOnStateValueChange('staminaDamage')(hero.state.staminaDamage - 1);
+                                                }}
+                                                className="h-8 w-8 flex items-center justify-center hover:bg-red-200 transition-colors flex-shrink-0 text-gray-700"
+                                            >
+                                                <Plus size={14} strokeWidth={3.0} />
+                                            </button>
+                                        </InputBackground>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="bg-slate-800 rounded p-2">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <span className="text-xs text-slate-300">Recoveries</span>
-                                    <p className="text-xs text-slate-500">+{recoveryValue} stamina</p>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-sm font-bold text-slate-200">
-                                        {maxRecoveries - hero.state.recoveriesUsed} / {maxRecoveries}
-                                    </span>
-                                    <button
-                                        onClick={() => {
-                                            onUpdate({
-                                                state: {
-                                                    ...hero.state,
-                                                    recoveriesUsed: 0,
+                            <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <span className="text-xs font-bold text-gray-500 uppercase">Recoveries</span>
+                                        <p className="text-xs text-gray-500">+{recoveryValue} stamina</p>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-sm font-bold text-gray-900 mr-2">
+                                            {maxRecoveries - hero.state.recoveriesUsed} / {maxRecoveries}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                onUpdate({
+                                                    state: {
+                                                        ...hero.state,
+                                                        recoveriesUsed: 0,
+                                                    }
+                                                });
+                                            }}
+                                            disabled={hero.state.recoveriesUsed == 0}
+                                            className={'w-7 h-7 flex items-center justify-center rounded bg-green-600 hover:bg-green-500 text-white disabled:bg-gray-300 disabled:cursor-not-allowed'}
+                                        >
+                                            <RotateCcw size={12} />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (hero.state.staminaDamage == 0) {
+                                                    return;
                                                 }
-                                            });
-                                        }}
-                                        disabled={hero.state.recoveriesUsed == 0}
-                                        className={'w-7 h-7 flex items-center justify-center rounded bg-green-600 hover:bg-green-500'}
-                                    >
-                                        <RotateCcw size={12} />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            if (hero.state.staminaDamage == 0) {
-                                                return;
-                                            }
-                                            onUpdate({
-                                                state: {
-                                                    ...hero.state,
-                                                    'recoveriesUsed': hero.state.recoveriesUsed + 1,
-                                                    'staminaDamage': Math.max(0, hero.state.staminaDamage - recoveryValue),
-                                                }
-                                            });
-                                        }}
-                                        disabled={hero.state.recoveriesUsed == maxRecoveries}
-                                        className={`w-7 h-7 flex items-center justify-center rounded ${hero.state.staminaDamage != 0 && hero.state.recoveriesUsed != maxRecoveries
-                                            ? 'bg-blue-600 hover:bg-blue-500'
-                                            : 'bg-slate-600 cursor-not-allowed opacity-50'
-                                        }`}
-                                    >
-                                        <Heart size={12} />
-                                    </button>
+                                                onUpdate({
+                                                    state: {
+                                                        ...hero.state,
+                                                        'recoveriesUsed': hero.state.recoveriesUsed + 1,
+                                                        'staminaDamage': Math.max(0, hero.state.staminaDamage - recoveryValue),
+                                                    }
+                                                });
+                                            }}
+                                            disabled={hero.state.recoveriesUsed == maxRecoveries}
+                                            className={`w-7 h-7 flex items-center justify-center rounded text-white ${hero.state.staminaDamage != 0 && hero.state.recoveriesUsed != maxRecoveries
+                                                ? 'bg-blue-600 hover:bg-blue-500'
+                                                : 'bg-gray-300 cursor-not-allowed'
+                                            }`}
+                                        >
+                                            <Heart size={12} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Right Column - Trackers */}
-                <div className="flex-1 bg-slate-700 rounded-lg p-2">
-                    <h2 className="text-sm font-semibold text-amber-400 mb-1">Trackers</h2>
-                    <div className="grid grid-cols-3 gap-1">
+                <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
+                    <div className="bg-indigo-900 text-white p-2">
+                        <h2 className="text-sm font-bold">Trackers</h2>
+                    </div>
+                    <div className="p-2 grid grid-cols-3 gap-2">
                         {Object.entries(counters).map(([key, value]) => (
                             <CounterTracker
                                 key={key}
@@ -189,16 +195,17 @@ export default function CharacterStats({ hero, onUpdate }: SheetHeaderProps) {
                     </div>
                 </div>
             </div>
-            <div className="bg-slate-700 rounded-lg p-1 flex-shrink-0 mb-2">
-                <div className="flex-1 bg-slate-700 rounded-lg p-1">
-                    <h2 className="text-sm font-semibold text-amber-400 mb-1">Skills</h2>
-                    <div className="flex flex-row flex-wrap">
-                        {hero.getSkills().map(skill =>
-                            <div key={skill.name} className="flex m-1">
-                                <InputBackground color={'DEFAULT'}><div className="p-1.5 text-sm">{skill.name}</div></InputBackground>
-                            </div>
-                        )}
-                    </div>
+            
+            <div className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden flex-shrink-0 mb-2">
+                <div className="bg-indigo-900 text-white p-2">
+                    <h2 className="text-sm font-bold">Skills</h2>
+                </div>
+                <div className="p-2 flex flex-row flex-wrap gap-2">
+                    {hero.getSkills().map(skill =>
+                        <div key={skill.name} className="flex">
+                            <InputBackground color={'DEFAULT'}><div className="p-1.5 text-sm text-gray-900">{skill.name}</div></InputBackground>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

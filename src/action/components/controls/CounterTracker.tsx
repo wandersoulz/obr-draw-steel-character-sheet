@@ -10,6 +10,9 @@ interface CounterTrackerProps {
     incrementHandler: () => void;
     decrementHandler: () => void;
     label: string;
+    textColor?: string;
+    labelColor?: string;
+    buttonColor?: string;
 }
 
 export function CounterTracker({
@@ -19,13 +22,16 @@ export function CounterTracker({
     incrementHandler,
     decrementHandler,
     label,
+    textColor = 'text-gray-900',
+    labelColor = 'text-gray-500',
+    buttonColor = 'text-gray-600',
 }: CounterTrackerProps) {
     return (
         <div className="flex flex-col justify-between flex-grow">
-            <label className="text-xs text-slate-400 capitalize mb-1 text-center">{label}</label>
+            <label className={cn("text-xs capitalize mb-1 text-center font-bold", labelColor)}>{label}</label>
             <InputBackground color={color}>
                 <button 
-                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-500 transition-colors text-slate-300"
+                    className={cn("h-8 w-8 flex items-center justify-center hover:bg-black/10 transition-colors", buttonColor)}
                     onClick={decrementHandler}
                 >
                     <Minus size={14} strokeWidth={3.0} />
@@ -34,10 +40,10 @@ export function CounterTracker({
                     value={parentValue.toString()}
                     onUpdate={updateHandler}
                     clearContentOnFocus
-                    className={cn('flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold text-slate-200 outline-none')}
+                    className={cn('flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold outline-none', textColor)}
                 />
                 <button 
-                    className="h-8 w-8 flex items-center justify-center hover:bg-slate-500 transition-colors text-slate-300"
+                    className={cn("h-8 w-8 flex items-center justify-center hover:bg-black/10 transition-colors", buttonColor)}
                     onClick={incrementHandler}
                 >
                     <Plus size={14} strokeWidth={3.0} />

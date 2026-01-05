@@ -1,10 +1,34 @@
+import { Hero } from 'forgesteel';
 import { Fragment, createElement } from 'react';
 import { JSX } from 'react/jsx-runtime';
 
 interface Props {
-	content?: string;
-	lookFor?: 'potencies' | 'characteristics' | 'both';
+    content?: string;
+    lookFor?: 'potencies' | 'characteristics' | 'both';
 }
+
+export const findCharacteristicsInPowerRoll = (hero: Hero, powerRoll?: string) => {
+    if (!powerRoll) return undefined;
+
+    const characteristicRegex = '\\b([MARIP])\\b';
+    let flags = 'g';
+    const regex = new RegExp(characteristicRegex, flags);
+    const characteristics = [...powerRoll.matchAll(regex)].map((str) => {
+        return str[1];
+    });
+    const mappedCharacteristics = hero.class?.characteristics
+        .filter((characteristic) =>
+            characteristics.some((c) => characteristic.characteristic.startsWith(c))
+        )
+        .map((characteristic) => {
+            return {
+                [characteristic.characteristic]: characteristic.value,
+            };
+        })
+        .reduce((acc, curr) => Object.assign(acc, curr), {});
+
+    return mappedCharacteristics;
+};
 
 export const DrawSteelSymbolText = (props: Props) => {
     const lookFor = props.lookFor || 'both';
@@ -34,12 +58,13 @@ export const DrawSteelSymbolText = (props: Props) => {
         const results: (string | JSX.Element)[] = [];
 
         let i = 0;
-        [ ...text.matchAll(regex) ].forEach(str => {
+        [...text.matchAll(regex)].forEach((str) => {
             const beforeMatch = text.slice(i, str.index);
             i = str.index + str[0].length;
             results.push(beforeMatch);
 
-            if (str.length > 2 && str[2]) { // potency
+            if (str.length > 2 && str[2]) {
+                // potency
                 const c = str[1].toLowerCase();
                 let check = str[2];
                 switch (str[2].toLowerCase()) {
@@ -53,9 +78,10 @@ export const DrawSteelSymbolText = (props: Props) => {
                         check = 's';
                         break;
                 }
-                results.push(<span className='potency'>{`${c}<${check},`}</span>);
-            } else { // characteristic
-                results.push(<span className='characteristic'>{str[1]}</span>);
+                results.push(<span className="potency">{`${c}<${check},`}</span>);
+            } else {
+                // characteristic
+                results.push(<span className="characteristic">{str[1]}</span>);
             }
         });
         results.push(text.slice(i));
@@ -63,9 +89,5 @@ export const DrawSteelSymbolText = (props: Props) => {
     };
 
     const content = tokenize(props.content || '');
-    return (
-        <div className="ml-1">
-            {content}
-        </div>
-    );
+    return <span className="ml-1">{content}</span>;
 };
