@@ -7,13 +7,14 @@ import OBR from '@owlbear-rodeo/sdk';
 import { BookOpen } from 'lucide-react';
 import { UploadCharacter } from '../components/action-buttons/upload-character';
 import { Hero } from 'forgesteel';
+import { CounterTracker } from '../components/controls/CounterTracker';
 
 interface PlayerViewProps {
     forgeSteelLoaded: boolean;
 }
 
 export function PlayerView({ forgeSteelLoaded }: PlayerViewProps) {
-    const { characters, addCharacter } = usePlayer();
+    const { characters, addCharacter, heroTokens, decrementHeroTokens } = usePlayer();
     const { roomCharacters } = useObr();
     const navigate = useNavigate();
 
@@ -47,43 +48,57 @@ export function PlayerView({ forgeSteelLoaded }: PlayerViewProps) {
                             Draw Steel - <span className="text-slate-500 font-normal">Player</span>
                         </h1>
                     </div>
-                    <button
-                        onClick={handleShowRulesClick}
-                        className="flex items-center px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all bg-indigo-800 text-slate-100 hover:bg-indigo-700 hover:text-white shadow-sm border border-indigo-700"
-                    >
-                        Show Rules
-                    </button>
+                    <div className="flex flex-row justify-center align-middle gap-5">
+                        <button
+                            onClick={handleShowRulesClick}
+                            className="h-fit mt-2 p-2 items-center rounded-full text-sm bg-indigo-800 text-slate-100 hover:bg-indigo-700 hover:text-white"
+                        >
+                            Show Rules
+                        </button>
+                        <CounterTracker
+                            parentValue={heroTokens}
+                            label="Hero Tokens"
+                            decrementHandler={decrementHeroTokens}
+                            textColor="text-slate-100"
+                            labelColor="text-slate-300"
+                            buttonColor="text-slate-300"
+                        />
+                    </div>
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-4">
-                <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
-                    <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
-                        <h2 className="text-base font-bold text-indigo-400">My Characters</h2>
+            <div className="flex flex-grow justify-center">
+                <div className="max-w-100 flex-1 overflow-y-auto p-2 flex flex-col gap-4">
+                    <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
+                        <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
+                            <h2 className="text-base font-bold text-indigo-400">My Characters</h2>
+                        </div>
+                        <UploadCharacter
+                            onUpload={(character: Hero | HeroLite) => {
+                                addCharacter(character);
+                            }}
+                        />
+                        <CharacterList
+                            canShare
+                            canDelete
+                            onCharacterClick={(character: HeroLite) =>
+                                navigate(`/character/${character.id}`)
+                            }
+                            characters={characters}
+                        />
                     </div>
-                    <UploadCharacter
-                        onUpload={(character: Hero | HeroLite) => {
-                            addCharacter(character);
-                        }}
-                    />
-                    <CharacterList
-                        canShare
-                        canDelete
-                        onCharacterClick={(character: HeroLite) =>
-                            navigate(`/character/${character.id}`)
-                        }
-                        characters={characters}
-                    />
-                </div>
-                <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
-                    <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
-                        <h2 className="text-base font-bold text-indigo-400">Shared Characters</h2>
+                    <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
+                        <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
+                            <h2 className="text-base font-bold text-indigo-400">
+                                Shared Characters
+                            </h2>
+                        </div>
+                        <CharacterList
+                            canCopy
+                            onCharacterClick={() => {}}
+                            characters={roomCharacters}
+                        />
                     </div>
-                    <CharacterList
-                        canCopy
-                        onCharacterClick={() => {}}
-                        characters={roomCharacters}
-                    />
                 </div>
             </div>
         </div>

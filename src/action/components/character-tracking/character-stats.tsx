@@ -23,11 +23,8 @@ export function CharacterStats({ hero }: CharacteristicsProps) {
                 <h2 className="text-sm font-bold">Character Stats</h2>
             </div>
             <div className="p-2 grid grid-cols-5 gap-2 border-b border-indigo-600">
-                {Object.keys(Characteristic).map((characteristic, index) => (
-                    <div
-                        key={characteristic}
-                        className={`flex flex-col items-center ${index < Object.keys(Characteristic).length - 1 ? 'border-r pr-1.5' : ''} border-indigo-600`}
-                    >
+                {Object.keys(Characteristic).map((characteristic) => (
+                    <div key={characteristic} className="flex flex-col items-center">
                         <span className="text-xs font-bold text-gray-500 mb-0.5">
                             {characteristic}
                         </span>
@@ -47,25 +44,25 @@ export function CharacterStats({ hero }: CharacteristicsProps) {
                 ))}
             </div>
             <div className="p-2 grid grid-cols-5 gap-2 bg-gray-50">
-                <div className="flex flex-col items-center border-r pr-1.5 border-indigo-600">
+                <div className="flex flex-col items-center pr-1.5">
                     <span className="text-xs font-bold text-gray-500 mb-0.5">Size</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{size}</span>
                     </div>
                 </div>
-                <div className="flex flex-col items-center border-r pr-1.5 border-indigo-600">
+                <div className="flex flex-col items-center pr-1.5">
                     <span className="text-xs font-bold text-gray-500 mb-0.5">Speed</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{speed}</span>
                     </div>
                 </div>
-                <div className="flex flex-col items-center border-r pr-1.5 border-indigo-600">
+                <div className="flex flex-col items-center pr-1.5">
                     <span className="text-xs font-bold text-gray-500 mb-0.5">Stability</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{stability}</span>
                     </div>
                 </div>
-                <div className="flex flex-col items-center border-r pr-1.5 border-indigo-600">
+                <div className="flex flex-col items-center pr-1.5">
                     <span className="text-xs font-bold text-gray-500 mb-0.5">Disengage</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{disengage}</span>
@@ -74,7 +71,7 @@ export function CharacterStats({ hero }: CharacteristicsProps) {
                 <div className="flex flex-col items-center">
                     <span className="text-xs font-bold text-gray-500 mb-0.5">Save</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
-                        <span className="text-md font-bold text-gray-900">+6</span>
+                        <span className="text-md font-bold text-gray-900">6≤</span>
                     </div>
                 </div>
             </div>

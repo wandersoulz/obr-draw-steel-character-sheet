@@ -47,7 +47,7 @@ export function CharacterTracking({ hero, onUpdate }: SheetHeaderProps) {
                 <CharacterStats hero={hero} />
                 <Conditions hero={hero} onUpdate={onUpdate} />
             </div>
-            <div className="flex sm:flex-row flex-col gap-2">
+            <div className="flex">
                 <Skills hero={hero} />
             </div>
         </div>

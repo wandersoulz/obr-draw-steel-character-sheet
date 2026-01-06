@@ -6,9 +6,9 @@ import { Minus, Plus } from 'lucide-react';
 interface CounterTrackerProps {
     parentValue: number;
     color?: string;
-    updateHandler: (target: HTMLInputElement) => void;
-    incrementHandler: () => void;
-    decrementHandler: () => void;
+    updateHandler?: (target: HTMLInputElement) => void;
+    incrementHandler?: () => void;
+    decrementHandler?: () => void;
     label: string;
     textColor?: string;
     labelColor?: string;
@@ -28,26 +28,39 @@ export function CounterTracker({
 }: CounterTrackerProps) {
     return (
         <div className="flex flex-col justify-between flex-grow">
-            <label className={cn("text-xs capitalize mb-1 text-center font-bold", labelColor)}>{label}</label>
+            <label className={cn('text-xs capitalize mb-1 text-center font-bold', labelColor)}>
+                {label}
+            </label>
             <InputBackground color={color}>
-                <button 
-                    className={cn("h-8 w-8 flex items-center justify-center hover:bg-black/10 transition-colors", buttonColor)}
+                <button
+                    className={cn(
+                        'h-8 w-8 flex items-center justify-center hover:bg-black/10 transition-colors',
+                        buttonColor
+                    )}
                     onClick={decrementHandler}
                 >
                     <Minus size={14} strokeWidth={3.0} />
                 </button>
                 <SmartNumericInput
                     value={parentValue.toString()}
-                    onUpdate={updateHandler}
+                    onUpdate={updateHandler || ((_: HTMLInputElement) => {})}
                     clearContentOnFocus
-                    className={cn('flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold outline-none', textColor)}
+                    className={cn(
+                        'flex-grow w-8 h-8 bg-transparent text-center text-sm font-bold outline-none',
+                        textColor
+                    )}
                 />
-                <button 
-                    className={cn("h-8 w-8 flex items-center justify-center hover:bg-black/10 transition-colors", buttonColor)}
-                    onClick={incrementHandler}
-                >
-                    <Plus size={14} strokeWidth={3.0} />
-                </button>
+                {incrementHandler && (
+                    <button
+                        className={cn(
+                            'h-8 w-8 flex items-center justify-center hover:bg-black/10 transition-colors',
+                            buttonColor
+                        )}
+                        onClick={incrementHandler}
+                    >
+                        <Plus size={14} strokeWidth={3.0} />
+                    </button>
+                )}
             </InputBackground>
         </div>
     );

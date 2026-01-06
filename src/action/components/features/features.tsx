@@ -88,24 +88,23 @@ export function Features({ hero, updateHero }: FeaturesProps) {
                     features={features}
                 />
             ))}
-            {Object.entries(featuresBySource).map(([source, features]) => (
-                <>
-                    {features.length == 0 ? (
-                        <></>
-                    ) : (
-                        <div key={source} className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
-                            <div className="bg-indigo-900 text-white p-2">
-                                <h2 className="text-md font-bold">{source}</h2>
-                            </div>
-                            <div className="p-3 bg-gray-100 flex flex-col gap-3">
-                                {features.map((feature) => (
-                                    <Feature key={feature.id} feature={feature} />
-                                ))}
-                            </div>
+            {Object.entries(featuresBySource)
+                .filter(([_, features]) => features.length > 0)
+                .map(([source, features]) => (
+                    <div
+                        key={source}
+                        className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden"
+                    >
+                        <div className="bg-indigo-900 text-white p-2">
+                            <h2 className="text-md font-bold">{source}</h2>
                         </div>
-                    )}
-                </>
-            ))}
+                        <div className="p-3 bg-gray-100 flex flex-col gap-3">
+                            {features.map((feature) => (
+                                <Feature key={feature.id} feature={feature} />
+                            ))}
+                        </div>
+                    </div>
+                ))}
         </div>
     );
 }

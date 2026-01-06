@@ -4,14 +4,24 @@ import { METADATA_KEYS } from '@/constants';
 import { GmState } from '@/stores/gmStore';
 import { HeroLite } from '@/models/hero-lite';
 
-export const obrGm = <T extends GmState>(
-    f: StateCreator<T, [], []>,
-): StateCreator<T, [], []> => (set, get, api) => {
+export const obrGm =
+    <T extends GmState>(f: StateCreator<T, [], []>): StateCreator<T, [], []> =>
+    (set, get, api) => {
         function handlePlayerUpdates() {
             OBR.party.onChange((players) => {
-                const allPlayerCharacters = Object.fromEntries(players.map((player) => {
-                    return [player.id, (player.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[] || []).map(HeroLite.fromHeroLiteInterface)];
-                }).filter(metadata => metadata[1].length != 0));
+                const allPlayerCharacters = Object.fromEntries(
+                    players
+                        .map((player) => {
+                            return [
+                                player.id,
+                                (
+                                    (player.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[]) ||
+                                    []
+                                ).map(HeroLite.fromHeroLiteInterface),
+                            ];
+                        })
+                        .filter((metadata) => metadata[1].length != 0)
+                );
                 set({ players, playerCharacters: allPlayerCharacters } as Partial<T>);
             });
         }
@@ -31,9 +41,18 @@ export const obrGm = <T extends GmState>(
             });
 
             const players = await OBR.party.getPlayers();
-            const allPlayerCharacters = Object.fromEntries(players.map((player) => {
-                return [player.id, (player.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[] || []).map(HeroLite.fromHeroLiteInterface)];
-            }).filter(metadata => metadata[1].length != 0));
+            const allPlayerCharacters = Object.fromEntries(
+                players
+                    .map((player) => {
+                        return [
+                            player.id,
+                            (
+                                (player.metadata[METADATA_KEYS.CHARACTER_DATA] as HeroLite[]) || []
+                            ).map(HeroLite.fromHeroLiteInterface),
+                        ];
+                    })
+                    .filter((metadata) => metadata[1].length != 0)
+            );
             set({ players, playerCharacters: allPlayerCharacters } as Partial<T>);
             isHydrated = true;
         });
@@ -52,20 +71,32 @@ export const obrGm = <T extends GmState>(
                     }, 100);
                 }).then(() => {
                     const { playerCharacters } = get();
-                    const updates = Object.values(playerCharacters).flat()
+                    const updates = Object.values(playerCharacters)
+                        .flat()
                         .filter((c) => c.tokenId != '')
                         .map((c) => ({ [c.tokenId]: c }))
-                        .reduce((prevVal: Record<string, HeroLite>, newVal: Record<string, HeroLite>) => Object.assign(prevVal, newVal), {} as Record<string, HeroLite>);
+                        .reduce(
+                            (prevVal: Record<string, HeroLite>, newVal: Record<string, HeroLite>) =>
+                                Object.assign(prevVal, newVal),
+                            {} as Record<string, HeroLite>
+                        );
 
-                    OBR.scene.items.updateItems(Object.keys(updates), (items) => {
-                        items.forEach((item) => {
-                            item.metadata[METADATA_KEYS.CHARACTER_DATA] = updates[item.id];
+                    // @ts-ignore
+                    if (api.__ZUSTAND_OBR_PLAYER_STORAGE_DEBOUNCE__)
+                        // @ts-ignore
+                        clearTimeout(api.__ZUSTAND_OBR_PLAYER_STORAGE_DEBOUNCE__);
+
+                    // @ts-ignore
+                    api.__ZUSTAND_OBR_PLAYER_STORAGE_DEBOUNCE__ = setTimeout(() => {
+                        OBR.scene.items.updateItems(Object.keys(updates), (items) => {
+                            items.forEach((item) => {
+                                item.metadata[METADATA_KEYS.CHARACTER_DATA] = updates[item.id];
+                            });
                         });
-                    });
+                    }, 500);
                 });
             },
             get,
             api
         );
     };
-

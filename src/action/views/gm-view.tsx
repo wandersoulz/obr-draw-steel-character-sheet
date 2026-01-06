@@ -21,7 +21,14 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
     const { roomCharacters } = useContext(OBRContext);
     const { malice, players, playerCharacters, incrementMalice, decrementMalice, setMalice } =
         useGmStore();
-    const { characters, addCharacter } = usePlayer();
+    const {
+        characters,
+        addCharacter,
+        heroTokens,
+        decrementHeroTokens,
+        incrementHeroTokens,
+        updateHeroTokens,
+    } = usePlayer();
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
     const [activeTab, setActiveTab] = useState<'my-characters' | 'players'>('my-characters');
 
@@ -36,6 +43,18 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
         });
         if (!isNaN(newValue)) {
             setMalice(newValue);
+        }
+    };
+
+    const handleHeroTokenUpdate = (target: HTMLInputElement) => {
+        const newValue = parseNumber(target.value, {
+            min: 0,
+            max: 999,
+            truncate: true,
+            inlineMath: { previousValue: malice },
+        });
+        if (!isNaN(newValue)) {
+            updateHeroTokens(newValue);
         }
     };
 
@@ -82,24 +101,46 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
 
                 <main className="flex flex-col flex-1 overflow-hidden">
                     <div className="flex justify-center p-2 items-center gap-2 flex-shrink-0">
-                        <div className="w-1/4">
-                            <CounterTracker
-                                parentValue={malice}
-                                label="Malice"
-                                incrementHandler={incrementMalice}
-                                decrementHandler={decrementMalice}
-                                updateHandler={handleMaliceUpdate}
-                                textColor="text-slate-100"
-                                labelColor="text-slate-300"
-                                buttonColor="text-slate-300"
-                            />
+                        <div className="flex flex-row flex-grow justify-center gap-2">
+                            <div>
+                                <CounterTracker
+                                    parentValue={malice}
+                                    label="Malice"
+                                    incrementHandler={incrementMalice}
+                                    decrementHandler={decrementMalice}
+                                    updateHandler={handleMaliceUpdate}
+                                    textColor="text-slate-100"
+                                    labelColor="text-slate-300"
+                                    buttonColor="text-slate-300"
+                                />
+                            </div>
+                            <button
+                                onClick={() => setMalice(0)}
+                                className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
+                            >
+                                <RotateCcw size={16} />
+                            </button>
                         </div>
-                        <button
-                            onClick={() => setMalice(0)}
-                            className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
-                        >
-                            <RotateCcw size={16} />
-                        </button>
+                        <div className="flex flex-row flex-grow justify-center gap-2">
+                            <div>
+                                <CounterTracker
+                                    parentValue={heroTokens}
+                                    label="Hero Tokens"
+                                    incrementHandler={incrementHeroTokens}
+                                    decrementHandler={decrementHeroTokens}
+                                    updateHandler={handleHeroTokenUpdate}
+                                    textColor="text-slate-100"
+                                    labelColor="text-slate-300"
+                                    buttonColor="text-slate-300"
+                                />
+                            </div>
+                            <button
+                                onClick={() => updateHeroTokens(0)}
+                                className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
+                            >
+                                <RotateCcw size={16} />
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex justify-center border-b border-slate-600 bg-slate-800">
@@ -127,34 +168,40 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
 
                     <div className="flex flex-1 overflow-hidden p-2 justify-center">
                         {activeTab === 'my-characters' && (
-                            <div className="max-w-200 h-full flex flex-col no-scrollbar overflow-y-auto">
-                                <h2 className="text-md font-bold mb-1 text-center">
-                                    My Characters
-                                </h2>
-                                <UploadCharacter
-                                    onUpload={(character: Hero | HeroLite) => {
-                                        addCharacter(character);
-                                    }}
-                                />
-                                <CharacterList
-                                    onCharacterClick={(character: HeroLite) =>
-                                        navigate(`/character/${character.id}`)
-                                    }
-                                    canDelete
-                                    canShare
-                                    characters={characters}
-                                />
-                                <h2 className="text-md font-bold mb-1 text-center border-t border-slate-700 mt-2 pt-2">
-                                    Shared Characters
-                                </h2>
-                                <CharacterList
-                                    onCharacterClick={(character: HeroLite) =>
-                                        navigate(`/character/${character.id}`)
-                                    }
-                                    canDelete
-                                    canCopy
-                                    characters={roomCharacters}
-                                />
+                            <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
+                                <div className="max-w-200 h-full flex flex-col no-scrollbar overflow-y-auto">
+                                    <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
+                                        <h2 className="text-base font-bold text-indigo-400">
+                                            My Characters
+                                        </h2>
+                                    </div>
+                                    <UploadCharacter
+                                        onUpload={(character: Hero | HeroLite) => {
+                                            addCharacter(character);
+                                        }}
+                                    />
+                                    <CharacterList
+                                        onCharacterClick={(character: HeroLite) =>
+                                            navigate(`/character/${character.id}`)
+                                        }
+                                        canDelete
+                                        canShare
+                                        characters={characters}
+                                    />
+                                    <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
+                                        <h2 className="text-base font-bold text-indigo-400">
+                                            Shared Characters
+                                        </h2>
+                                    </div>
+                                    <CharacterList
+                                        onCharacterClick={(character: HeroLite) =>
+                                            navigate(`/character/${character.id}`)
+                                        }
+                                        canDelete
+                                        canCopy
+                                        characters={roomCharacters}
+                                    />
+                                </div>
                             </div>
                         )}
 

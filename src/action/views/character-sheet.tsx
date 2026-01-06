@@ -198,17 +198,19 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                 isOpen={diceRollerModalIsOpen}
                 initialRollAttributes={rollAttributes}
             />
-            <div className="w-full bg-slate-800 flex flex-col h-full overflow-hidden">
+            <div className="w-full bg-slate-700 flex flex-col h-full overflow-hidden">
                 <div className="flex-shrink-0">
                     {/* Header */}
                     <header className="bg-slate-900 shadow-lg border-b border-slate-700 px-3 py-2 flex items-center justify-between flex-shrink-0">
-                        <button
-                            onClick={() => navigate('/')}
-                            className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-white transition-colors"
-                        >
-                            <ArrowLeft size={16} />
-                            Back
-                        </button>
+                        <div className="absolute left-2">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                            >
+                                <ArrowLeft size={16} />
+                                Back
+                            </button>
+                        </div>
 
                         <div className="text-center flex-1 mx-4">
                             <input
@@ -222,7 +224,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="absolute right-2 flex items-center gap-2">
                             <button
                                 onClick={handleAddItem}
                                 className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
@@ -237,26 +239,26 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                             </button>
                         </div>
                     </header>
-                    <div className="flex border-b border-slate-700 bg-slate-800 flex-shrink-0">
+                    <div className="flex bg-slate-900 flex-shrink-0">
                         {['tracking', 'features', 'class abilities'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex-1 py-2 text-sm font-medium capitalize transition-all relative ${
                                     activeTab === tab
-                                        ? 'text-indigo-400'
+                                        ? 'text-indigo-200'
                                         : 'text-slate-400 hover:text-slate-200'
                                 }`}
                             >
                                 {tab}
                                 {activeTab === tab && (
-                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-400 rounded-t-full" />
+                                    <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 rounded-t-full" />
                                 )}
                             </button>
                         ))}
                     </div>
                 </div>
-                <div className="flex-1 flex flex-col no-scrollbar overflow-y-auto bg-slate-900">
+                <div className="flex-1 flex flex-col no-scrollbar overflow-y-auto bg-slate-700">
                     <div className="flex flex-col flex-1 p-2 gap-4">
                         {activeTab == 'tracking' && (
                             <CharacterTracking
