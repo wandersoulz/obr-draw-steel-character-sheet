@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import CharacterStats from '../components/character-stats/CharacterStats';
+import { CharacterTracking } from '../components/character-tracking/character-tracking';
 import { HeroLite } from '../../models/hero-lite';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
@@ -259,7 +259,11 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                 <div className="flex-1 flex flex-col no-scrollbar overflow-y-auto bg-slate-900">
                     <div className="flex flex-col flex-1 p-2 gap-4">
                         {activeTab == 'tracking' && (
-                            <CharacterStats hero={fullHero} isOwner={false} onUpdate={onUpdate} />
+                            <CharacterTracking
+                                hero={fullHero}
+                                isOwner={false}
+                                onUpdate={onUpdate}
+                            />
                         )}
                         {activeTab == 'class abilities' && <CharacterAbilities hero={fullHero} />}
                         {activeTab == 'features' && (

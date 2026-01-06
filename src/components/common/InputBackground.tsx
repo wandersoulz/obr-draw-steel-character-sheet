@@ -20,6 +20,8 @@ export default function InputBackground({ children, color, className, ...props }
                     'bg-violet-600/30 dark:bg-violet-600/30 hover:bg-violet-500/30':
                         color === 'VIOLET',
                     'bg-slate-600/30 dark:bg-slate-600/30 hover:bg-slate-500/30': color === 'GRAY',
+                    'bg-yellow-600/30 dark:bg-yellow-600/30': color === 'YELLOW',
+                    'bg-orange-600/30 dark:bg-orange-600/30': color === 'ORANGE',
                     'bg-mirage-400/30 dark:bg-mirage-500/30': color === 'DEFAULT',
                 },
                 className

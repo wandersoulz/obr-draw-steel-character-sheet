@@ -4,9 +4,10 @@ import {
     AbilityKeyword,
     Characteristic,
     ElementFactory,
+    AbilityUsage,
 } from 'forgesteel';
-import { AbilityCard } from './ability/AbilityCard';
-import { findCharacteristicsInPowerRoll } from './ability/ds-symbol-text-component';
+import { AbilitySection } from './ability-section';
+import { Activity, Flame, Footprints, Heart, Swords, Zap } from 'lucide-react';
 
 interface CharacterAbilitiesProps {
     hero: Hero;
@@ -63,33 +64,71 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
         ],
     });
 
-    const freeStrikes = [freeStrikeMelee, freeStrikeRanged].map((a) =>
+    let abilitySheets = abilities.map((a) =>
         ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined)
-    );
-    let abilitySheets = freeStrikes.concat(
-        abilities.map((a) => ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined))
     );
 
     abilitySheets = abilitySheets.filter((ability, index) => {
         return index === abilitySheets.findIndex((t) => t.id === ability.id);
     });
 
+    const mainActions = abilitySheets.filter(
+        (ability) => ability.actionType == AbilityUsage.MainAction
+    );
+    const maneuvers = abilitySheets.filter(
+        (ability) => ability.actionType == AbilityUsage.Maneuver
+    );
+    const freeStrikes = [freeStrikeMelee, freeStrikeRanged].map((a) =>
+        ClassicSheetBuilder.buildAbilitySheet(a, hero, undefined)
+    );
+    const movement = abilitySheets.filter((ability) => ability.actionType == AbilityUsage.Move);
+    const triggeredActions = abilitySheets.filter(
+        (ability) => ability.actionType == AbilityUsage.Trigger
+    );
+
+    const abilitySections = {
+        'Main Action': mainActions,
+        Maneuvers: maneuvers,
+        'Free Strikes': freeStrikes,
+        Move: movement,
+        'Triggered Actions': triggeredActions,
+    };
+
+    const getIcon = (name: string) => {
+        switch (name) {
+            case 'Main Action':
+                return Swords;
+            case 'Maneuvers':
+                return Zap;
+            case 'Free Strikes':
+                return Flame;
+            case 'Triggered Actions':
+                return Activity;
+            case 'Move':
+                return Footprints;
+            default:
+                return Heart;
+        }
+    };
+
     return (
-        <div className="flex flex-col gap-3 flex-1 min-h-0 m-2">
-            <div className="columns-1 md:columns-2 gap-3 space-y-3">
-                {abilitySheets.map((ability) => (
-                    <div key={ability.id} className="break-inside-avoid">
-                        <AbilityCard
-                            characteristicValues={findCharacteristicsInPowerRoll(
-                                hero,
-                                ability.rollPower
-                            )}
-                            heroicResourceName={heroicResourceName}
-                            ability={ability}
-                        />
-                    </div>
+        <div className="space-y-2">
+            {Object.entries(abilitySections)
+                .filter(([_, abilities]) => abilities.length > 0)
+                .map(([name, abilities]) => (
+                    <AbilitySection
+                        name={name}
+                        abilities={abilities}
+                        icon={getIcon(name)}
+                        color="violet"
+                        heroicResourceName={heroicResourceName}
+                        heroCharacteristics={Object.fromEntries(
+                            hero.class!.characteristics.map((value) => {
+                                return [value.characteristic, value.value];
+                            })
+                        )}
+                    />
                 ))}
-            </div>
         </div>
     );
 }

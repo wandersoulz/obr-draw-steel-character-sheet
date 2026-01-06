@@ -23,6 +23,7 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
         useGmStore();
     const { characters, addCharacter } = usePlayer();
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+    const [activeTab, setActiveTab] = useState<'my-characters' | 'players'>('my-characters');
 
     useEffect(() => {}, [characters, forgeSteelLoaded]);
 
@@ -100,77 +101,127 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
                             <RotateCcw size={16} />
                         </button>
                     </div>
-                    <div className="flex flex-1 overflow-hidden">
-                        <div
-                            className={`${selectedPlayer ? 'md:w-1/3' : 'md:w-1/2'} flex flex-col border-r border-slate-700 mb-2 no-scrollbar overflow-y-auto`}
+
+                    <div className="flex justify-center border-b border-slate-600 bg-slate-800">
+                        <button
+                            className={`px-4 py-2 font-bold transition-colors ${
+                                activeTab === 'my-characters'
+                                    ? 'text-indigo-400 border-b-2 border-indigo-400'
+                                    : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                            onClick={() => setActiveTab('my-characters')}
                         >
-                            <h2 className="text-md font-bold mb-1 text-center">My Characters</h2>
-                            <UploadCharacter
-                                onUpload={(character: Hero | HeroLite) => {
-                                    addCharacter(character);
-                                }}
-                            />
-                            <CharacterList
-                                onCharacterClick={(character: HeroLite) =>
-                                    navigate(`/character/${character.id}`)
-                                }
-                                canDelete
-                                canShare
-                                characters={characters}
-                            />
-                            <h2 className="text-md font-bold mb-1 text-center border-t border-slate-700 mt-2 pt-2">
-                                Shared Characters
-                            </h2>
-                            <CharacterList
-                                onCharacterClick={(character: HeroLite) =>
-                                    navigate(`/character/${character.id}`)
-                                }
-                                canDelete
-                                canCopy
-                                characters={roomCharacters}
-                            />
-                        </div>
-                        <div
-                            className={`${selectedPlayer ? 'md:w-1/3 border-r border-slate-700' : 'md:w-1/2'} flex flex-col pr-2 overflow-y-auto`}
+                            My Characters
+                        </button>
+                        <button
+                            className={`px-4 py-2 font-bold transition-colors ${
+                                activeTab === 'players'
+                                    ? 'text-indigo-400 border-b-2 border-indigo-400'
+                                    : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                            onClick={() => setActiveTab('players')}
                         >
-                            <h2 className="text-md font-bold mb-1 text-center">Players</h2>
-                            {players.length != 0 ? (
-                                <ul>
-                                    {players.map((player) => (
-                                        <li
-                                            key={player.id}
-                                            className={`cursor-pointer p-2 m-1 rounded ${
-                                                selectedPlayer?.id === player.id
-                                                    ? 'bg-slate-700'
-                                                    : ''
-                                            }`}
-                                            onClick={() => setSelectedPlayer(player)}
-                                        >
-                                            {player.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <></>
-                            )}
-                        </div>
-                        {selectedPlayer && (
-                            <div className="md:w-1/3 flex flex-col border-r border-slate-700 pr-2 overflow-y-auto">
+                            Players
+                        </button>
+                    </div>
+
+                    <div className="flex flex-1 overflow-hidden p-2 justify-center">
+                        {activeTab === 'my-characters' && (
+                            <div className="max-w-200 h-full flex flex-col no-scrollbar overflow-y-auto">
                                 <h2 className="text-md font-bold mb-1 text-center">
-                                    {selectedPlayer.name}'s Characters
+                                    My Characters
                                 </h2>
-                                {playerCharacters &&
-                                    playerCharacters[selectedPlayer.id] &&
-                                    playerCharacters[selectedPlayer.id].length > 0 && (
-                                        <CharacterList
-                                            onCharacterClick={(character) =>
-                                                navigate(`/character/${character.id}`)
-                                            }
-                                            characters={playerCharacters[selectedPlayer.id].filter(
-                                                (character) => character.tokenId != ''
-                                            )}
-                                        />
+                                <UploadCharacter
+                                    onUpload={(character: Hero | HeroLite) => {
+                                        addCharacter(character);
+                                    }}
+                                />
+                                <CharacterList
+                                    onCharacterClick={(character: HeroLite) =>
+                                        navigate(`/character/${character.id}`)
+                                    }
+                                    canDelete
+                                    canShare
+                                    characters={characters}
+                                />
+                                <h2 className="text-md font-bold mb-1 text-center border-t border-slate-700 mt-2 pt-2">
+                                    Shared Characters
+                                </h2>
+                                <CharacterList
+                                    onCharacterClick={(character: HeroLite) =>
+                                        navigate(`/character/${character.id}`)
+                                    }
+                                    canDelete
+                                    canCopy
+                                    characters={roomCharacters}
+                                />
+                            </div>
+                        )}
+
+                        {activeTab === 'players' && (
+                            <div className="w-full h-full flex flex-col md:flex-row gap-4 overflow-hidden">
+                                <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
+                                    <h2 className="text-md font-bold mb-1 text-center">Players</h2>
+                                    {players.length != 0 ? (
+                                        <ul>
+                                            {players.map((player) => (
+                                                <li
+                                                    key={player.id}
+                                                    className={`cursor-pointer p-2 m-1 rounded ${
+                                                        selectedPlayer?.id === player.id
+                                                            ? 'bg-slate-700'
+                                                            : 'hover:bg-slate-800'
+                                                    }`}
+                                                    onClick={() => setSelectedPlayer(player)}
+                                                >
+                                                    {player.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <div className="text-center text-slate-500 italic mt-4">
+                                            No players connected
+                                        </div>
                                     )}
+                                </div>
+                                <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
+                                    <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
+                                        {selectedPlayer ? (
+                                            <>
+                                                <h2 className="text-md font-bold mb-1 text-center">
+                                                    {selectedPlayer.name}'s Characters
+                                                </h2>
+                                                {playerCharacters &&
+                                                playerCharacters[selectedPlayer.id] &&
+                                                playerCharacters[selectedPlayer.id].length > 0 ? (
+                                                    <CharacterList
+                                                        onCharacterClick={(character) =>
+                                                            navigate(`/character/${character.id}`)
+                                                        }
+                                                        characters={playerCharacters[
+                                                            selectedPlayer.id
+                                                        ].filter(
+                                                            (character) => character.tokenId != ''
+                                                        )}
+                                                    />
+                                                ) : (
+                                                    <div className="text-center text-slate-500 italic">
+                                                        No characters assigned
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <span>
+                                                <h2 className="text-md font-bold mb-1 text-center">
+                                                    Characters
+                                                </h2>
+                                                <div className="text-center text-slate-500 italic mt-4">
+                                                    Select a player to view their characters
+                                                </div>
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

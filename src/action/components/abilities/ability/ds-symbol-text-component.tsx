@@ -1,4 +1,3 @@
-import { Hero } from 'forgesteel';
 import { Fragment, createElement } from 'react';
 import { JSX } from 'react/jsx-runtime';
 
@@ -7,8 +6,11 @@ interface Props {
     lookFor?: 'potencies' | 'characteristics' | 'both';
 }
 
-export const findCharacteristicsInPowerRoll = (hero: Hero, powerRoll?: string) => {
-    if (!powerRoll) return undefined;
+export const findCharacteristicsInPowerRoll = (
+    heroCharacteristics?: Record<string, number>,
+    powerRoll?: string
+) => {
+    if (!powerRoll || !heroCharacteristics) return undefined;
 
     const characteristicRegex = '\\b([MARIP])\\b';
     let flags = 'g';
@@ -16,16 +18,11 @@ export const findCharacteristicsInPowerRoll = (hero: Hero, powerRoll?: string) =
     const characteristics = [...powerRoll.matchAll(regex)].map((str) => {
         return str[1];
     });
-    const mappedCharacteristics = hero.class?.characteristics
-        .filter((characteristic) =>
-            characteristics.some((c) => characteristic.characteristic.startsWith(c))
+    const mappedCharacteristics = Object.fromEntries(
+        Object.entries(heroCharacteristics).filter(([characteristic, _]) =>
+            characteristics.some((c) => characteristic.startsWith(c))
         )
-        .map((characteristic) => {
-            return {
-                [characteristic.characteristic]: characteristic.value,
-            };
-        })
-        .reduce((acc, curr) => Object.assign(acc, curr), {});
+    );
 
     return mappedCharacteristics;
 };

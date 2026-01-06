@@ -1,4 +1,10 @@
-import { AbilityCustomizationInterface, FeatureType, Hero, HeroInterface, HeroStateInterface } from 'forgesteel';
+import {
+    AbilityCustomizationInterface,
+    FeatureType,
+    Hero,
+    HeroInterface,
+    HeroStateInterface,
+} from 'forgesteel';
 import { AncestryLite } from './ancestry-lite';
 import { AncestryConverter } from '@/conversion/ancestry-converter';
 import { CultureConverter } from '@/conversion/culture-converter';
@@ -42,7 +48,7 @@ export class HeroLite {
         features: FeatureInterface[],
         abilityCustomizations: AbilityCustomizationInterface[],
         state: HeroStateInterface,
-        heroicResourceValue: number,
+        heroicResourceValue: number
     ) {
         this.id = id;
         this.name = name;
@@ -73,7 +79,7 @@ export class HeroLite {
             this.features,
             this.abilityCustomizations,
             this.state,
-            this.heroicResourceValue,
+            this.heroicResourceValue
         );
     }
 
@@ -91,7 +97,7 @@ export class HeroLite {
             interfaceValue.features,
             interfaceValue.abilityCustomizations,
             interfaceValue.state,
-            interfaceValue.heroicResourceValue,
+            interfaceValue.heroicResourceValue
         );
     }
 
@@ -103,7 +109,8 @@ export class HeroLite {
         this.ancestry = partialUpdate.ancestry ?? this.ancestry;
         this.culture = partialUpdate.culture ?? this.culture;
         this.state = partialUpdate.state ?? this.state;
-        this.abilityCustomizations = partialUpdate.abilityCustomizations ?? this.abilityCustomizations;
+        this.abilityCustomizations =
+            partialUpdate.abilityCustomizations ?? this.abilityCustomizations;
         this.features = partialUpdate.features ?? this.features;
         this.class = partialUpdate.class ?? this.class;
         this.career = partialUpdate.career ?? this.career;
@@ -124,7 +131,11 @@ export class HeroLite {
             hero.features,
             hero.abilityCustomizations,
             hero.state,
-            hero.getFeatures().map(f => f.feature).filter(f => f.type === FeatureType.HeroicResource).find(f => f.data.type === 'heroic')?.data.value || 0
+            hero
+                .getFeatures()
+                .map((f) => f.feature)
+                .filter((f) => f.type === FeatureType.HeroicResource)
+                .find((f) => f.data.type === 'heroic')?.data.value || 0
         );
     }
 
@@ -136,19 +147,24 @@ export class HeroLite {
             career: CareerConverter.toCareer(this.career),
             culture: CultureConverter.toCulture(this.culture),
             class: ClassConverter.toClass(this.class),
-            complication: this.complication ? ComplicationConverter.toComplication(this.complication) : null,
+            complication: this.complication
+                ? ComplicationConverter.toComplication(this.complication)
+                : null,
             features: this.features,
             state: this.state,
             picture: null,
             folder: this.tokenId,
             settingIDs: [],
-            abilityCustomizations: []
+            abilityCustomizations: [],
         };
         const hero = new Hero(heroConfig);
-        hero.getFeatures().map(f => f.feature).filter(f => f.type === FeatureType.HeroicResource).forEach(f => {
-            f.data.value = this.heroicResourceValue || 0;
-        });
-        
+        hero.getFeatures()
+            .map((f) => f.feature)
+            .filter((f) => f.type === FeatureType.HeroicResource)
+            .forEach((f) => {
+                f.data.value = this.heroicResourceValue || 0;
+            });
+
         return hero;
     }
 

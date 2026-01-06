@@ -8,7 +8,7 @@ import * as DiceProtocol from '../../../utils/dice-protocol';
 import { OBRContext } from '@/context/obr-context';
 import { Roll, RollAttributes } from '@/models/dice-roller-types';
 import OBR from '@owlbear-rodeo/sdk';
-import DiceRoller from './roll-dice';
+import { DiceRollerView } from './roll-dice';
 import { useModalStore } from '@/stores/modalStore';
 import { X } from 'lucide-react';
 import { HeroLite } from '@/models/hero-lite';
@@ -99,7 +99,7 @@ export function DiceRollerModal({
                         >
                             <X className="w-5 h-5 text-gray-500" />
                         </button>
-                        <DiceRoller
+                        <DiceRollerView
                             playerName={playerName}
                             diceResultViewerOpen={diceResultViewerOpen}
                             setDiceResultViewerOpen={setDiceResultViewerOpen}

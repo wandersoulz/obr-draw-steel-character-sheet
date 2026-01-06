@@ -32,7 +32,7 @@ interface DiceRollerProps {
     heroicResourceValue: number;
 }
 
-export default function DiceRoller({
+export function DiceRollerView({
     playerName,
     rollAttributes,
     setRollAttributes,

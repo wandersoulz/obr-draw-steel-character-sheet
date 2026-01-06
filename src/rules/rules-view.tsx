@@ -1,4 +1,4 @@
-import { useState, useMemo, ReactNode } from 'react';
+import { useState, useMemo, ReactNode, useEffect } from 'react';
 import { Search, BookOpen, Zap, ShieldAlert, FileText, X } from 'lucide-react';
 import OBR from '@owlbear-rodeo/sdk';
 import AbilityCard from './ability-card';
@@ -6,22 +6,21 @@ import RuleCard from './rule-card';
 import ConditionCard from './condition-card';
 import { DRAW_STEEL_RULES } from '../data/data';
 import { Ability, Condition, GeneralRule } from '@/models/rules-data-types';
+import { useQuery } from '@/hooks/useQuery';
 
 type AllRuleData = GeneralRule | Ability | Condition;
 
 const getAllData = () => {
-    const sources = [
-        DRAW_STEEL_RULES,
-    ];
+    const sources = [DRAW_STEEL_RULES];
 
     let allItems: AllRuleData[] = [];
-    sources.forEach(source => {
+    sources.forEach((source) => {
         if (source.rules) allItems = [...allItems, ...source.rules];
         if (source.actions) allItems = [...allItems, ...source.actions];
         if (source.conditions) allItems = [...allItems, ...source.conditions];
     });
 
-    return Array.from(new Map(allItems.map(item => [item.title, item])).values());
+    return Array.from(new Map(allItems.map((item) => [item.title, item])).values());
 };
 
 const MASTER_DATA = getAllData();
@@ -29,8 +28,16 @@ const MASTER_DATA = getAllData();
 type FilterType = 'all' | 'ability' | 'condition' | 'rule';
 
 export const RulesView = () => {
+    const searchParams = useQuery();
+    const initialFilter = searchParams.get('filter');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+
+    useEffect(() => {
+        if (initialFilter) {
+            setActiveFilter(initialFilter as FilterType);
+        }
+    }, [initialFilter]);
 
     const filteredData = useMemo(() => {
         return MASTER_DATA.filter((item) => {
@@ -45,8 +52,11 @@ export const RulesView = () => {
             const searchRule = (rule: AllRuleData) => {
                 const term = searchTerm.toLowerCase();
                 const matchTitle = rule.title.toLowerCase().includes(term);
-                const matchDesc = 'description' in rule && rule.description?.toLowerCase().includes(term);
-                const matchKeywords = 'keywords' in rule && rule.keywords?.some((k: string) => k.toLowerCase().includes(term));
+                const matchDesc =
+                    'description' in rule && rule.description?.toLowerCase().includes(term);
+                const matchKeywords =
+                    'keywords' in rule &&
+                    rule.keywords?.some((k: string) => k.toLowerCase().includes(term));
                 const matchEffects = 'effect' in rule && rule.effect?.toLowerCase().includes(term);
                 const matchActionType = 'type' in rule && rule.type?.toLowerCase().includes(term);
 
@@ -55,12 +65,13 @@ export const RulesView = () => {
             const matchItem = searchRule(item);
 
             if ('subRules' in item && item.subRules && item.subRules.length > 0) {
-                const subRulesMatch = item.subRules.some((subRule: GeneralRule) => searchRule(subRule));
+                const subRulesMatch = item.subRules.some((subRule: GeneralRule) =>
+                    searchRule(subRule)
+                );
                 return matchItem || subRulesMatch;
             } else {
                 return matchItem;
             }
-
         });
     }, [searchTerm, activeFilter]);
 
@@ -73,10 +84,15 @@ export const RulesView = () => {
                             <div className="flex w-full items-center gap-2">
                                 <BookOpen className="text-indigo-400 w-6 h-6" />
                                 <h1 className="text-xl font-bold text-slate-100 tracking-tight">
-                  Draw Steel <span className="text-slate-500 font-normal">Rules Reference</span>
+                                    Draw Steel{' '}
+                                    <span className="text-slate-500 font-normal">
+                                        Rules Reference
+                                    </span>
                                 </h1>
                                 <button
-                                    onClick={() => OBR.popover.close('rules-reference-viewer-draw-steel')}
+                                    onClick={() =>
+                                        OBR.popover.close('rules-reference-viewer-draw-steel')
+                                    }
                                     className="ml-auto p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                                     title="Close Rules"
                                 >
@@ -134,15 +150,20 @@ export const RulesView = () => {
                                     onClick={() => setSearchTerm('')}
                                     className="mt-2 text-indigo-500 hover:text-indigo-400 underline"
                                 >
-                  Clear search
+                                    Clear search
                                 </button>
                             </div>
                         ) : (
                             <div className="columns-1 md:columns-2 lg:columns-2 gap-2 space-y-2">
                                 {filteredData.map((item, index) => (
-                                    <div key={`${item.title}-${index}`} className="break-inside-avoid">
+                                    <div
+                                        key={`${item.title}-${index}`}
+                                        className="break-inside-avoid"
+                                    >
                                         {item.kind === 'ability' && <AbilityCard ability={item} />}
-                                        {item.kind === 'condition' && <ConditionCard condition={item} />}
+                                        {item.kind === 'condition' && (
+                                            <ConditionCard condition={item} />
+                                        )}
                                         {item.kind === 'rule' && <RuleCard rule={item} />}
                                     </div>
                                 ))}
@@ -156,10 +177,10 @@ export const RulesView = () => {
 };
 
 interface FilterTabProps {
-  label: string;
-  icon?: ReactNode;
-  isActive: boolean;
-  onClick: () => void;
+    label: string;
+    icon?: ReactNode;
+    isActive: boolean;
+    onClick: () => void;
 }
 
 const FilterTab = ({ label, icon, isActive, onClick }: FilterTabProps) => (
@@ -167,10 +188,11 @@ const FilterTab = ({ label, icon, isActive, onClick }: FilterTabProps) => (
         onClick={onClick}
         className={`
       flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all
-      ${isActive
-        ? 'bg-indigo-600 text-white shadow-md'
-        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-    }
+      ${
+          isActive
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+      }
     `}
     >
         {icon}
