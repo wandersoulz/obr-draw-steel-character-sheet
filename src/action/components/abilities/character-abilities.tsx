@@ -7,18 +7,7 @@ import {
     Characteristic,
 } from 'forgesteel';
 import { AbilitySection } from './ability-section';
-import {
-    Activity,
-    Ban,
-    Crown,
-    Eye,
-    EyeOff,
-    Flame,
-    Footprints,
-    Heart,
-    Swords,
-    Zap,
-} from 'lucide-react';
+import { Activity, Crown, Eye, EyeOff, Flame, Footprints, Heart, Swords, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { AbilityData } from 'forgesteel/data';
 
@@ -42,12 +31,7 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
     const [showSignature, setShowSignature] = useState(true);
 
     const heroicResource = hero.getHeroicResources()[0];
-    const heroicResourceName = heroicResource.name;
     const abilities = hero.getAbilities([]).map((a) => a.ability);
-    const heroicAbilities = abilities.filter((a) => a.cost != 'signature' && a.cost > 0);
-    const minHeroicCost =
-        heroicAbilities.length > 0 ? Math.min(...heroicAbilities.map((a) => a.cost as number)) : 0;
-    const isHeroicDisabled = heroicAbilities.length > 0 && heroicResource.value < minHeroicCost;
 
     const freeStrikeMelee = ElementFactory.createAbility({
         id: 'free-melee',
@@ -113,8 +97,6 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
         if (isHeroic && !showHeroic) return false;
         if (isSignature && !showSignature) return false;
 
-        if (isHeroic && ability.cost > heroicResource.value) return false;
-
         return true;
     });
 
@@ -145,31 +127,18 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
         <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-end gap-2 px-1">
                 <button
-                    onClick={() => !isHeroicDisabled && setShowHeroic(!showHeroic)}
-                    disabled={isHeroicDisabled}
+                    onClick={() => setShowHeroic(!showHeroic)}
                     className={`
                         flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide transition-all border
                         ${
-                            isHeroicDisabled
-                                ? 'bg-slate-900/50 text-slate-500 border-slate-800 cursor-default grayscale' // DISABLED STYLE
-                                : showHeroic
-                                  ? 'bg-violet-900/50 text-violet-200 border-violet-600 hover:bg-violet-900 shadow-[0_0_10px_rgba(124,58,237,0.2)]'
-                                  : 'bg-slate-800 text-slate-500 border-slate-700 hover:bg-slate-700 hover:text-slate-300 opacity-60'
+                            showHeroic
+                                ? 'bg-violet-900/50 text-violet-200 border-violet-600 hover:bg-violet-900 shadow-[0_0_10px_rgba(124,58,237,0.2)]'
+                                : 'bg-slate-800 text-slate-500 border-slate-700 hover:bg-slate-700 hover:text-slate-300 opacity-60'
                         }
                     `}
                 >
-                    {isHeroicDisabled ? (
-                        <Ban className="w-3.5 h-3.5" />
-                    ) : (
-                        <Crown className="w-3.5 h-3.5" />
-                    )}
-
-                    {/* Dynamic Label: Shows Resource Count if Disabled */}
-                    <span>
-                        {isHeroicDisabled
-                            ? `No ${heroicResource.name}`
-                            : `Heroic (${heroicResource.value})`}
-                    </span>
+                    <Crown className="w-3.5 h-3.5" />
+                    <span>{`Heroic (${heroicResource.value})`}</span>
                 </button>
                 <button
                     onClick={() => setShowSignature(!showSignature)}
@@ -228,7 +197,7 @@ export function CharacterAbilities({ hero }: CharacterAbilitiesProps) {
                                 abilities={abilities}
                                 icon={theme.icon}
                                 color={theme.color}
-                                heroicResourceName={heroicResourceName}
+                                heroicResourceName={heroicResource.name}
                                 heroCharacteristics={Object.fromEntries(
                                     hero.class!.characteristics.map((value) => [
                                         value.characteristic,
