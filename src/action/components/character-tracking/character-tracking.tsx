@@ -41,7 +41,7 @@ export function CharacterTracking({ hero, onUpdate }: SheetHeaderProps) {
                     heroicResourceName={heroicResourceName}
                     onValueChanged={getOnStateValueChange}
                 />
-                <Vitality hero={hero} onValueChanged={getOnStateValueChange} />
+                <Vitality hero={hero} onUpdate={onUpdate} onValueChanged={getOnStateValueChange} />
             </div>
             <div className="flex sm:flex-row flex-col gap-2">
                 <CharacterStats hero={hero} />

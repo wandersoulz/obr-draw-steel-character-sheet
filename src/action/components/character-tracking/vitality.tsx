@@ -5,13 +5,15 @@ import SmartNumericInput from '../controls/SmartNumericInput';
 import { Hero } from 'forgesteel';
 import { useMemo } from 'react';
 import { Recovery } from './recovery';
+import { HeroLite } from '@/models/hero-lite';
 
 interface VitalityProps {
     hero: Hero;
+    onUpdate: (update: Partial<HeroLite>) => void;
     onValueChanged: (fieldName: string) => (newValue: number) => void;
 }
 
-export function Vitality({ hero, onValueChanged }: VitalityProps) {
+export function Vitality({ hero, onUpdate, onValueChanged }: VitalityProps) {
     const { maxStamina, windedThreshold, maxRecoveries, recoveryValue } = useMemo(() => {
         return {
             maxStamina: hero.getStamina(),
@@ -54,7 +56,7 @@ export function Vitality({ hero, onValueChanged }: VitalityProps) {
                                             )
                                         );
                                     }}
-                                    className="h-8 w-8 flex items-center justify-center hover:bg-red-200 transition-colors text-gray-700"
+                                    className="h-8 w-8 flex items-center justify-center hover:bg-blue-200 transition-colors text-gray-700"
                                 >
                                     <Minus size={14} strokeWidth={3.0} />
                                 </button>
@@ -89,7 +91,7 @@ export function Vitality({ hero, onValueChanged }: VitalityProps) {
                                             hero.state.staminaDamage - 1
                                         );
                                     }}
-                                    className="h-8 w-8 flex items-center justify-center hover:bg-red-200 transition-colors flex-shrink-0 text-gray-700"
+                                    className="h-8 w-8 flex items-center justify-center hover:bg-blue-200 transition-colors flex-shrink-0 text-gray-700"
                                 >
                                     <Plus size={14} strokeWidth={3.0} />
                                 </button>
@@ -99,6 +101,7 @@ export function Vitality({ hero, onValueChanged }: VitalityProps) {
                 </div>
                 <Recovery
                     hero={hero}
+                    onUpdate={onUpdate}
                     onValueChanged={onValueChanged}
                     maxRecoveries={maxRecoveries}
                     recoveryValue={recoveryValue}

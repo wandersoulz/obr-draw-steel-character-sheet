@@ -4,15 +4,23 @@ import { Hero } from 'forgesteel';
 import { Heart, Minus, Plus, RotateCcw } from 'lucide-react';
 import SmartNumericInput from '../controls/SmartNumericInput';
 import { useMemo } from 'react';
+import { HeroLite } from '@/models/hero-lite';
 
 interface RecoveryProps {
     hero: Hero;
+    onUpdate: (update: Partial<HeroLite>) => void;
     onValueChanged: (fieldName: string) => (newValue: number) => void;
     maxRecoveries: number;
     recoveryValue: number;
 }
 
-export function Recovery({ hero, onValueChanged, maxRecoveries, recoveryValue }: RecoveryProps) {
+export function Recovery({
+    hero,
+    onValueChanged,
+    onUpdate,
+    maxRecoveries,
+    recoveryValue,
+}: RecoveryProps) {
     const color = useMemo(() => {
         return hero.state.recoveriesUsed >= maxRecoveries - 2
             ? 'red'
@@ -91,10 +99,16 @@ export function Recovery({ hero, onValueChanged, maxRecoveries, recoveryValue }:
                             if (hero.state.staminaDamage == 0) {
                                 return;
                             }
-                            onValueChanged('recoveriesUsed')(hero.state.recoveriesUsed + 1);
-                            onValueChanged('staminaDamage')(
-                                Math.max(0, hero.state.staminaDamage - recoveryValue)
-                            );
+                            onUpdate({
+                                state: {
+                                    ...hero.state,
+                                    staminaDamage: Math.max(
+                                        0,
+                                        hero.state.staminaDamage - recoveryValue
+                                    ),
+                                    recoveriesUsed: hero.state.recoveriesUsed + 1,
+                                },
+                            });
                         }}
                         disabled={hero.state.recoveriesUsed == maxRecoveries}
                         className={`w-7 h-7 flex items-center justify-center rounded text-white ${
