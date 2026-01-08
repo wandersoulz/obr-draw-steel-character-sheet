@@ -46,7 +46,6 @@ export const obrRoom =
 
                 // @ts-ignore
                 api.__ZUSTAND_OBR_ROOM_STORAGE_DEBOUNCE__ = setTimeout(() => {
-                    console.log('setting metadata');
                     OBR.room.setMetadata({
                         [METADATA_KEYS.TOKEN_DATA]: {
                             heroTokens: heroTokens,

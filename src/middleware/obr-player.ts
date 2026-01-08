@@ -65,8 +65,10 @@ export const obrPlayer =
         }
 
         OBR.onReady(async () => {
-            OBR.player.setMetadata({ [METADATA_KEYS.CHARACTER_DATA]: get().characters });
-            handleItemUpdates();
+            setTimeout(() => {
+                OBR.player.setMetadata({ [METADATA_KEYS.CHARACTER_DATA]: get().characters });
+                handleItemUpdates();
+            }, 100);
         });
 
         return f(
