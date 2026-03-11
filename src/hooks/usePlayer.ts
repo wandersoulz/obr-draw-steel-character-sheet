@@ -19,6 +19,7 @@ export function usePlayer() {
     const updatePlayerCharacter = usePlayerStore((state) => state.updateCharacter);
     const removePlayerCharacter = usePlayerStore((state) => state.removePlayerCharacter);
     const getCharacters = usePlayerStore((state) => state.getCharacters);
+    const resetCharacter = usePlayerStore((state) => state.resetCharacter);
 
     const addCharacter = (newCharacter: Hero | HeroLite) => {
         if (newCharacter instanceof Hero) addPlayerCharacter(HeroLite.fromHero(newCharacter));
@@ -29,13 +30,15 @@ export function usePlayer() {
         const character = HeroLite.fromHeroLiteInterface(characterInterface);
         const updatedCharacter = character.copyOf();
         updatedCharacter.update(partialHero);
-        // Update persisted copy
         updatePlayerCharacter(updatedCharacter);
-        // Update token if assigned
     };
 
     const removeCharacter = (character: HeroLite) => {
         removePlayerCharacter(character);
+    };
+
+    const resetPlayerCharacter = (character: HeroLite) => {
+        resetCharacter(character);
     };
 
     return {
@@ -48,5 +51,6 @@ export function usePlayer() {
         incrementHeroTokens,
         decrementHeroTokens,
         updateHeroTokens,
+        resetPlayerCharacter,
     };
 }

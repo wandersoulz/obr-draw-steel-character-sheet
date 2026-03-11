@@ -2,6 +2,8 @@ import { DeleteCharacter } from '@/action/components/action-buttons/delete-chara
 import { ShareCharacter } from '@/action/components/action-buttons/share-character';
 import { CopyCharacter } from '@/action/components/action-buttons/copy-button';
 import { HeroLite } from '@/models/hero-lite';
+import { FLAGS } from '@/flags/flags';
+import { ResetCharacter } from '@/action/components/action-buttons/reset-character';
 
 interface CharacterTagProps {
     character: HeroLite;
@@ -46,6 +48,11 @@ export function CharacterTag({ character, onClick, canShare = false, canDelete =
             {canDelete && (
                 <div className="relative ml-2 flex-shrink-0">
                     <DeleteCharacter character={character} />
+                </div>
+            )}
+            {FLAGS.RESET_CHARACTER && (
+                <div className="relative ml-2 flex-shrink-0">
+                    <ResetCharacter character={character} />
                 </div>
             )}
         </div>

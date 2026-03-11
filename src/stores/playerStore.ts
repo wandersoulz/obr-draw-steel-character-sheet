@@ -9,6 +9,7 @@ export interface PlayerState {
     addCharacter: (character: HeroLite) => void;
     updateCharacter: (character: HeroLite) => void;
     removePlayerCharacter: (character: HeroLite) => void;
+    resetCharacter: (character: HeroLite) => void;
 }
 
 export const usePlayerStore = create<PlayerState>()(
@@ -33,6 +34,16 @@ export const usePlayerStore = create<PlayerState>()(
                     const characters = state.characters
                         .map((c) => (c.id === character.id ? null : c))
                         .filter((c) => c != null);
+                    return { characters };
+                }),
+            resetCharacter: (character) => 
+                set((state) => {
+                    const char: HeroLite | undefined = state.characters.find(c => c.id == character.id);
+                    let characters = state.characters;
+                    if (char) {
+                        char.features = char.features.filter(feature => feature.type != "Title");
+                        characters = state.characters.map(oldChar => char.id == oldChar.id ? char : oldChar);
+                    }
                     return { characters };
                 }),
         })),

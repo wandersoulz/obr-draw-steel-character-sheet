@@ -39,6 +39,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const featureModalIsOpen = useModalStore((state) => state.featureModalIsOpen);
     const setFeatureModalIsOpen = useModalStore((state) => state.setFeatureModalIsOpen);
     const rollAttributes = useModalStore((state) => state.diceRollerAttributes);
+    const [modalType, setModalType] = useState("");
 
     useEffect(() => {
         const character = characters.find((character) => character.id == characterId);
@@ -115,29 +116,32 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
         }
     };
 
-    const showFeatureSelectModal = (features: ElementInterface[]) => {
+    const showFeatureSelectModal = (features: ElementInterface[], modalType: string) => {
+        setModalType(modalType);
         setFeatures(features);
         setFeatureModalIsOpen(true);
     };
 
     const handleAddItem = () => {
         const items = ActiveSourcebooks.getInstance().getItems();
-        showFeatureSelectModal(items);
+        showFeatureSelectModal(items, "items");
     };
 
     const handleAddTitle = () => {
         const titles = ActiveSourcebooks.getInstance().getTitles();
-        showFeatureSelectModal(titles);
+        showFeatureSelectModal(titles, "titles");
     };
 
     const handleOnModalClose = (feature: ElementInterface) => {
         if (!activeCharacter) return;
         const partialCharacter: Partial<HeroLite> = {};
         const itemFeature = feature as ItemInterface;
-        if ('type' in itemFeature && itemFeature.type.indexOf('Item') > -1) {
+        if (modalType == "items") {
+            const activeInventory = activeCharacter.state.inventory || [];
+            activeInventory.push(itemFeature);
             partialCharacter.state = {
                 ...activeCharacter.state,
-                inventory: [itemFeature],
+                inventory: activeInventory,
             };
         } else {
             const titleFeature = feature as TitleInterface;
@@ -156,6 +160,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
             ];
         }
         const updatedChar: HeroLite = Object.assign(activeCharacter, partialCharacter);
+        setModalType("");
         setActiveCharacter(updatedChar);
         updateCharacter(activeCharacter, partialCharacter);
         setFeatureModalIsOpen(false);
