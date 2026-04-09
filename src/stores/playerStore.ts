@@ -4,6 +4,7 @@ import { obrPlayer } from '@/middleware/obr-player';
 import { persist } from 'zustand/middleware';
 
 export interface PlayerState {
+    playerId: string;
     characters: HeroLite[];
     getCharacters: () => HeroLite[];
     addCharacter: (character: HeroLite) => void;
@@ -15,6 +16,7 @@ export interface PlayerState {
 export const usePlayerStore = create<PlayerState>()(
     persist(
         obrPlayer((set, get) => ({
+            playerId: "",
             characters: [],
             getCharacters: () => get().characters.map(HeroLite.fromHeroLiteInterface),
             addCharacter: (character) =>

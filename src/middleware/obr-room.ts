@@ -14,28 +14,25 @@ export const obrRoom =
             }
             // @ts-ignore
             api.__ZUSTAND_OBR_ROOM_UNSUB__ = OBR.room.onMetadataChange((metadata) => {
-                const { heroTokens, userId } = metadata[METADATA_KEYS.TOKEN_DATA] as {
+                const { heroTokens } = (metadata[METADATA_KEYS.HERO_TOKEN_DATA] as {
                     heroTokens: number;
-                    userId: string;
-                };
-                if (userId == OBR.player.id) return;
+                }) || { heroTokens: 0 };
                 set({ heroTokens } as Partial<T>);
             });
         }
 
         OBR.onReady(async () => {
             const metadata = await OBR.room.getMetadata();
-            const { heroTokens } = metadata[METADATA_KEYS.TOKEN_DATA] as {
+            const { heroTokens } = (metadata[METADATA_KEYS.HERO_TOKEN_DATA] as {
                 heroTokens: number;
-                userId: string;
-            };
+            }) || { heroTokens: 0 };
             set({ heroTokens } as Partial<T>);
 
             handleRoomUpdates();
         });
 
         return f(
-            (args) => {
+            async (args) => {
                 set(args);
                 const { heroTokens } = get();
                 // @ts-ignore
@@ -45,14 +42,13 @@ export const obrRoom =
                 }
 
                 // @ts-ignore
-                api.__ZUSTAND_OBR_ROOM_STORAGE_DEBOUNCE__ = setTimeout(() => {
-                    OBR.room.setMetadata({
-                        [METADATA_KEYS.TOKEN_DATA]: {
+                api.__ZUSTAND_OBR_ROOM_STORAGE_DEBOUNCE__ = setTimeout(async () => {
+                    await OBR.room.setMetadata({
+                        [METADATA_KEYS.HERO_TOKEN_DATA]: {
                             heroTokens: heroTokens,
-                            userId: OBR.player.id,
                         },
                     });
-                }, 400);
+                }, 150);
             },
             get,
             api

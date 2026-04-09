@@ -30,14 +30,17 @@ type FilterType = 'all' | 'ability' | 'condition' | 'rule';
 export const RulesView = () => {
     const searchParams = useQuery();
     const initialFilter = searchParams.get('filter');
+    const initialSearch = searchParams.get('search');
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
     useEffect(() => {
-        if (initialFilter) {
-            setActiveFilter(initialFilter as FilterType);
-        }
+        if (initialFilter) setActiveFilter(initialFilter as FilterType);
     }, [initialFilter]);
+
+    useEffect(() => {
+        if (initialSearch) setSearchTerm(initialSearch);
+    }, [initialSearch]);
 
     const filteredData = useMemo(() => {
         return MASTER_DATA.filter((item) => {

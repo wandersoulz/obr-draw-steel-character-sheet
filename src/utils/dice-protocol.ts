@@ -24,13 +24,6 @@ export const DICE_ROLLER_HELLO_CHANNEL = 'general.diceRoller.hello';
 /** Channel used for contacting the dice client. */
 export const DICE_CLIENT_HELLO_CHANNEL = 'general.diceClient.hello';
 
-// Note: Change these two values if you are implementing this protocol in another extension. Comment out the values if you are not using them. The dice extension does not define the result channel and the dice client does not define the roll request channel, so you should only need one of these channels.
-
-/** Channel where this extension receives roll requests. */
-// export const ROLL_REQUEST_CHANNEL = "rodeo.owlbear.rollRequest";
-/** Channel where this extension receives roll results. */
-export const ROLL_RESULT_CHANNEL = 'drawSteelCharacterSheet.rollResult';
-
 // General types
 
 export type DieStyle = {
@@ -40,7 +33,7 @@ export type DieStyle = {
     color: string; //
 };
 
-export type DieType = 'D4' | 'D6' | 'D8' | 'D10' | 'D12' | 'D20' | 'D100';
+export type DieType = 'D3' | 'D4' | 'D6' | 'D8' | 'D10' | 'D12' | 'D20' | 'D100';
 
 export type Die = {
     /** The ID associated with this die's result. */
@@ -73,8 +66,6 @@ export type DiceRollerConfig = {
 export interface RollRequestBase {
     /** ID of this request. Recommended format `myExtension-${Date.now()}` */
     id: string;
-    /** Channel where the dice client can receive the roll result. */
-    replyChannel: string;
     /** Prevent rolls from being shown to users without GM access. */
     gmOnly: boolean;
     /** The style for all dice. This can overridden by setting the styleId for a specific die. If no style is given the default will be used. */
@@ -109,7 +100,7 @@ export interface PowerRollProperties {
     /** Edges - Banes. */
     netEdges: number;
     /** Number of d10s and selection strategy in dice notation. */
-    dice: '2d10' | '3d10kh2' | '3d10kl2';
+    dice: string;
 }
 
 /** Format for messages requesting a power roll. */
@@ -118,11 +109,6 @@ export interface PowerRollRequest extends RollRequestBase {
 }
 
 /** Format for messages sent when a power roll has been completed. */
-export type PowerRollResult = {
-    /** ID of the request that initiated this roll. */
-    id: string;
-    /** Access requirement given in the request that initiated this roll. */
-    gmOnly: boolean;
-    result: DieResult[];
+export interface PowerRollResult extends RollResult {
     rollProperties: PowerRollProperties;
-};
+}

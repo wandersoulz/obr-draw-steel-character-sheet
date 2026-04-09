@@ -20,6 +20,12 @@ import { FeatureSelectModal } from '../components/controls/FeatureSelectModal';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DiceRollerModal } from '../components/dice/dice-roller-modal';
 import { useModalStore } from '@/stores/modalStore';
+import { PlayerCombat } from '../components/combat/player-combat';
+import { useCombatStore } from '@/stores/combatStore';
+import { usePlayerCombat } from '@/hooks/usePlayerCombat';
+import OBR from '@owlbear-rodeo/sdk';
+import { createRollRequest, useDiceRoller } from '@/hooks/useDiceRoller';
+import { RollResult } from '@/utils/dice-protocol';
 
 interface CharacterSheetProps {
     forgeSteelLoaded: boolean;
@@ -39,7 +45,15 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
     const featureModalIsOpen = useModalStore((state) => state.featureModalIsOpen);
     const setFeatureModalIsOpen = useModalStore((state) => state.setFeatureModalIsOpen);
     const rollAttributes = useModalStore((state) => state.diceRollerAttributes);
-    const [modalType, setModalType] = useState("");
+    const [modalType, setModalType] = useState('');
+    const { initiative, startCombat, numPlayers, numEnemyGroups } = useCombatStore();
+    const combatState = usePlayerCombat(activeCharacter?.tokenId);
+    const diceRoller = useDiceRoller<RollResult>({ rollReplyChannel: 'initiative-roller-result' });
+
+    const tabs = ['tracking', 'features', 'class abilities'];
+    if (initiative != 'no-combat') {
+        tabs.push('combat');
+    }
 
     useEffect(() => {
         const character = characters.find((character) => character.id == characterId);
@@ -124,19 +138,19 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
 
     const handleAddItem = () => {
         const items = ActiveSourcebooks.getInstance().getItems();
-        showFeatureSelectModal(items, "items");
+        showFeatureSelectModal(items, 'items');
     };
 
     const handleAddTitle = () => {
         const titles = ActiveSourcebooks.getInstance().getTitles();
-        showFeatureSelectModal(titles, "titles");
+        showFeatureSelectModal(titles, 'titles');
     };
 
     const handleOnModalClose = (feature: ElementInterface) => {
         if (!activeCharacter) return;
         const partialCharacter: Partial<HeroLite> = {};
         const itemFeature = feature as ItemInterface;
-        if (modalType == "items") {
+        if (modalType == 'items') {
             const activeInventory = activeCharacter.state.inventory || [];
             activeInventory.push(itemFeature);
             partialCharacter.state = {
@@ -160,7 +174,7 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
             ];
         }
         const updatedChar: HeroLite = Object.assign(activeCharacter, partialCharacter);
-        setModalType("");
+        setModalType('');
         setActiveCharacter(updatedChar);
         updateCharacter(activeCharacter, partialCharacter);
         setFeatureModalIsOpen(false);
@@ -174,6 +188,20 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
             );
             setActiveCharacter(updatedChar);
         }
+    };
+
+    const handleDrawSteel = () => {
+        if (diceRoller.config !== undefined)
+            diceRoller
+                .requestRoll(createRollRequest('initiative-die-roll', ['1d10'], 0))
+                .then((data) => {
+                    const roll = data.result
+                        .map((r) => r.result)
+                        .reduce((prev, curr) => prev + curr, 0);
+                    const startingInitiative = roll >= 6 ? 'heroes' : 'enemies';
+                    startCombat(startingInitiative, numPlayers, numEnemyGroups);
+                    OBR.notification.show(startingInitiative == 'heroes' ? "Heroes act first!" : "Director has the first turn!");
+                });
     };
 
     if (!forgeSteelLoaded) return <div></div>;
@@ -206,18 +234,18 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
             <div className="w-full bg-slate-700 flex flex-col h-full overflow-hidden">
                 <div className="flex-shrink-0">
                     {/* Header */}
-                    <header className="bg-slate-900 shadow-lg border-b border-slate-700 px-3 py-2 flex items-center justify-between flex-shrink-0">
-                        <div className="absolute left-2">
+                    <header className="bg-slate-900 shadow-lg border-b border-slate-700 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0 flex-shrink-0">
+                        <div className="w-full md:w-auto flex justify-start">
                             <button
                                 onClick={() => navigate('/')}
-                                className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                                className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-white transition-colors p-2 md:p-0 -ml-2 md:ml-0"
                             >
                                 <ArrowLeft size={16} />
                                 Back
                             </button>
                         </div>
 
-                        <div className="text-center flex-1 mx-4">
+                        <div className="text-center w-full md:flex-1 md:mx-4 flex flex-col justify-center">
                             <input
                                 className="w-full text-xl text-center font-bold text-slate-100 bg-transparent outline-none placeholder-slate-600 focus:text-white"
                                 value={activeCharacter.name}
@@ -229,23 +257,31 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                             </p>
                         </div>
 
-                        <div className="absolute right-2 flex items-center gap-2">
+                        <div className="w-full md:w-auto flex items-center justify-center gap-3">
+                            {initiative === 'no-combat' && (
+                                <button
+                                    onClick={handleDrawSteel}
+                                    className="px-4 py-2 md:px-3 md:py-1 min-h-[44px] md:min-h-0 text-sm md:text-xs font-bold rounded-full bg-red-700 text-red-100 border border-red-600 hover:bg-red-600 hover:text-white transition-colors shadow-sm"
+                                >
+                                    Draw Steel!
+                                </button>
+                            )}
                             <button
                                 onClick={handleAddItem}
-                                className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
+                                className="px-4 py-2 md:px-3 md:py-1 min-h-[44px] md:min-h-0 text-sm md:text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
                             >
                                 Add Item
                             </button>
                             <button
                                 onClick={handleAddTitle}
-                                className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
+                                className="px-4 py-2 md:px-3 md:py-1 min-h-[44px] md:min-h-0 text-sm md:text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
                             >
                                 Add Title
                             </button>
                         </div>
                     </header>
                     <div className="flex bg-slate-900 flex-shrink-0">
-                        {['tracking', 'features', 'class abilities'].map((tab) => (
+                        {tabs.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -275,6 +311,14 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                         {activeTab == 'class abilities' && <CharacterAbilities hero={fullHero} />}
                         {activeTab == 'features' && (
                             <Features updateHero={onUpdate} hero={fullHero} />
+                        )}
+                        {activeTab == 'combat' && (
+                            <PlayerCombat
+                                hero={fullHero}
+                                activeCharacter={activeCharacter}
+                                onUpdate={onUpdate}
+                                combatState={combatState}
+                            />
                         )}
                     </div>
                 </div>

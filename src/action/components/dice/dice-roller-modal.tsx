@@ -1,17 +1,17 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import getResetRollAttributes, {
+import {
+    getResetRollAttributes,
     defaultRollerAttributes,
-    powerRoll,
     useDiceRoller,
-} from './dice-helpers';
-import * as DiceProtocol from '../../../utils/dice-protocol';
+    parsePowerRoll,
+} from '@/hooks/useDiceRoller';
 import { OBRContext } from '@/context/obr-context';
 import { Roll, RollAttributes } from '@/models/dice-roller-types';
-import OBR from '@owlbear-rodeo/sdk';
 import { DiceRollerView } from './roll-dice';
 import { useModalStore } from '@/stores/modalStore';
 import { X } from 'lucide-react';
 import { HeroLite } from '@/models/hero-lite';
+import { PowerRollResult } from '@/utils/dice-protocol';
 
 interface DiceRollerModalProps {
     hero: HeroLite;
@@ -48,25 +48,21 @@ export function DiceRollerModal({
     };
 
     const handleRollResult = useCallback(
-        (data: DiceProtocol.PowerRollResult) => {
+        (data: PowerRollResult) => {
             updateHeroicResource();
-            OBR.action.open();
             const rolls = data.result.map((val) => val.result);
             for (let i = 0; i < rolls.length; i++) {
                 if (rolls[i] === 0) rolls[i] = 10;
             }
 
             setResult(
-                powerRoll({
-                    bonus: data.rollProperties.bonus,
-                    hasSkill: data.rollProperties.hasSkill,
-                    netEdges: data.rollProperties.netEdges,
-                    playerName,
-                    rollMethod: 'givenValues',
-                    dieValues: rolls,
-                    selectionStrategy:
-                        data.rollProperties.dice === '3d10kl2' ? 'lowest' : 'highest',
-                })
+                parsePowerRoll(
+                    data.rollProperties.bonus,
+                    data.rollProperties.netEdges,
+                    data.rollProperties.hasSkill,
+                    rolls,
+                    data.rollProperties.dice === '3d10kl2' ? 'lowest' : 'highest'
+                )
             );
             setRollAttributes({
                 ...getResetRollAttributes({
@@ -77,7 +73,9 @@ export function DiceRollerModal({
         },
         [playerName, rollAttributes]
     );
-    const diceRoller = useDiceRoller({ onRollResult: handleRollResult });
+    const diceRoller = useDiceRoller<PowerRollResult>({
+        rollReplyChannel: 'draw-steel-sheets-power-roll-results',
+    });
 
     return (
         <>
@@ -100,7 +98,7 @@ export function DiceRollerModal({
                             <X className="w-5 h-5 text-gray-500" />
                         </button>
                         <DiceRollerView
-                            playerName={playerName}
+                            handleRollResult={handleRollResult}
                             diceResultViewerOpen={diceResultViewerOpen}
                             setDiceResultViewerOpen={setDiceResultViewerOpen}
                             rollAttributes={rollAttributes}

@@ -11,9 +11,10 @@ export default defineConfig({
                 action: resolve(__dirname, 'action.html'),
                 background: resolve(__dirname, 'background.html'),
                 assignCharacter: resolve(__dirname, 'assignCharacter.html'),
+                groupEnemies: resolve(__dirname, 'groupEnemies.html'),
                 'rules-ref': resolve(__dirname, 'rules-ref.html'),
-            }
-        }
+            },
+        },
     },
     resolve: {
         alias: {

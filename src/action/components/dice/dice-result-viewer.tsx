@@ -1,5 +1,5 @@
 import type { Roll } from '../../../models/dice-roller-types';
-import { netEdgesTextAndLabel } from './dice-helpers';
+import { netEdgesTextAndLabel } from '@/hooks/useDiceRoller';
 import D10Icon from '../../../components/icons/d10';
 import { cn } from '../../../utils/className';
 

@@ -1,9 +1,8 @@
 import { HistoryIcon, LoaderCircleIcon, MinusIcon, PlusIcon } from 'lucide-react';
-import getResetRollAttributes, { powerRoll, createRollRequest } from './dice-helpers';
+import { createPowerRollRequest } from '@/hooks/useDiceRoller';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -19,12 +18,14 @@ import { Button } from '../../../components/common/button';
 import { ToggleGroup } from '@/components/common/toggle';
 import { useModalStore } from '@/stores/modalStore';
 import { useEffect, useMemo } from 'react';
+import * as DiceProtocol from '@/utils/dice-protocol';
+import OBR from '@owlbear-rodeo/sdk';
 
 interface DiceRollerProps {
-    playerName: string;
     rollAttributes: RollAttributes;
+    handleRollResult: (value: DiceProtocol.PowerRollResult) => void;
     setRollAttributes: React.Dispatch<React.SetStateAction<RollAttributes>>;
-    diceRoller: DiceRoller;
+    diceRoller: DiceRoller<DiceProtocol.PowerRollResult>;
     result: Roll | undefined;
     setResult: React.Dispatch<React.SetStateAction<Roll | undefined>>;
     diceResultViewerOpen: boolean;
@@ -33,8 +34,8 @@ interface DiceRollerProps {
 }
 
 export function DiceRollerView({
-    playerName,
     rollAttributes,
+    handleRollResult,
     setRollAttributes,
     diceRoller,
     result,
@@ -227,9 +228,6 @@ export function DiceRollerView({
                     >
                         <DialogHeader>
                             <DialogTitle className="hidden">Roll Result</DialogTitle>
-                            <DialogDescription className="hidden">
-                                The result of your power roll.
-                            </DialogDescription>
                             {result === undefined ? (
                                 <div className="grid place-items-center gap-4 p-4">
                                     <div className="p-4">
@@ -251,33 +249,24 @@ export function DiceRollerView({
                         if (!canRoll) return;
                         setDiceResultViewerOpen(true);
                         if (diceRoller.config === undefined) {
-                            setResult(
-                                powerRoll({
-                                    playerName,
-                                    bonus: rollAttributes.bonus,
-                                    hasSkill: rollAttributes.hasSkill,
-                                    netEdges,
-                                    rollMethod: 'rollNow',
-                                    dice: '2d10',
-                                })
-                            );
-                            setRollAttributes(
-                                getResetRollAttributes({
-                                    bonus: rollAttributes.bonus,
-                                })
+                            OBR.notification.show(
+                                'Config for dice roller not loaded...',
+                                'WARNING'
                             );
                         } else {
                             setResult(undefined);
-                            diceRoller.requestRoll(
-                                createRollRequest({
-                                    bonus: rollAttributes.bonus,
-                                    netEdges,
-                                    hasSkill: rollAttributes.hasSkill,
-                                    styleId: rollAttributes.style?.id,
-                                    dice: '2d10',
-                                    gmOnly: false,
-                                })
-                            );
+                            diceRoller
+                                .requestRoll(
+                                    createPowerRollRequest({
+                                        bonus: rollAttributes.bonus,
+                                        netEdges,
+                                        hasSkill: rollAttributes.hasSkill,
+                                        styleId: rollAttributes.style?.id,
+                                        dice: '2d10',
+                                        gmOnly: false,
+                                    })
+                                )
+                                .then(handleRollResult);
                         }
                     }}
                 >

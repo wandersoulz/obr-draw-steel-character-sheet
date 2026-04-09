@@ -5,12 +5,13 @@ import { Hero } from 'forgesteel';
 import { HeroLite } from '../../models/hero-lite';
 import { useGmStore } from '../../stores/gmStore';
 import { CounterTracker } from '../components/controls/CounterTracker';
-import { RotateCcw, BookOpen } from 'lucide-react';
+import { RotateCcw, BookOpen, Swords } from 'lucide-react';
 import parseNumber from '../../utils/input';
 import { OBRContext } from '@/context/obr-context';
 import { UploadCharacter } from '../components/action-buttons/upload-character';
 import { CharacterList } from '@/components/character/character-list';
 import { useNavigate } from 'react-router-dom';
+import GMCombatView from '../components/combat/gm-combat';
 
 interface GMViewProps {
     forgeSteelLoaded: boolean;
@@ -31,6 +32,7 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
     } = usePlayer();
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
     const [activeTab, setActiveTab] = useState<'my-characters' | 'players'>('my-characters');
+    const [showCombatView, setShowCombatView] = useState(false);
 
     useEffect(() => {}, [characters, forgeSteelLoaded]);
 
@@ -90,189 +92,218 @@ export default function GMView({ forgeSteelLoaded }: GMViewProps) {
                                 <span className="text-slate-500 font-normal">GM</span>
                             </h1>
                         </div>
-                        <button
-                            onClick={handleShowRulesClick}
-                            className="flex items-center px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all bg-indigo-800 text-slate-100 hover:bg-indigo-700 hover:text-white shadow-sm border border-indigo-700"
-                        >
-                            Show Rules
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    const newValue = !showCombatView;
+                                    setShowCombatView(newValue);
+                                }}
+                                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shadow-sm border ${
+                                    showCombatView
+                                        ? 'bg-red-800 text-slate-100 border-red-700 hover:bg-red-700'
+                                        : 'bg-slate-800 text-slate-100 border-slate-700 hover:bg-slate-700'
+                                }`}
+                            >
+                                <Swords size={16} />
+                                {showCombatView ? 'Hide Combat' : 'Combat'}
+                            </button>
+                            <button
+                                onClick={handleShowRulesClick}
+                                className="flex items-center px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all bg-indigo-800 text-slate-100 hover:bg-indigo-700 hover:text-white shadow-sm border border-indigo-700"
+                            >
+                                Show Rules
+                            </button>
+                        </div>
                     </div>
                 </header>
 
-                <main className="flex flex-col flex-1 overflow-hidden">
-                    <div className="flex justify-center p-2 items-center gap-2 flex-shrink-0">
-                        <div className="flex flex-row flex-grow justify-center gap-2">
-                            <div>
-                                <CounterTracker
-                                    parentValue={malice}
-                                    label="Malice"
-                                    incrementHandler={incrementMalice}
-                                    decrementHandler={decrementMalice}
-                                    updateHandler={handleMaliceUpdate}
-                                    textColor="text-slate-100"
-                                    labelColor="text-slate-300"
-                                    buttonColor="text-slate-300"
-                                />
-                            </div>
-                            <button
-                                onClick={() => setMalice(0)}
-                                className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
-                            >
-                                <RotateCcw size={16} />
-                            </button>
-                        </div>
-                        <div className="flex flex-row flex-grow justify-center gap-2">
-                            <div>
-                                <CounterTracker
-                                    parentValue={heroTokens}
-                                    label="Hero Tokens"
-                                    incrementHandler={incrementHeroTokens}
-                                    decrementHandler={decrementHeroTokens}
-                                    updateHandler={handleHeroTokenUpdate}
-                                    textColor="text-slate-100"
-                                    labelColor="text-slate-300"
-                                    buttonColor="text-slate-300"
-                                />
-                            </div>
-                            <button
-                                onClick={() => updateHeroTokens(0)}
-                                className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
-                            >
-                                <RotateCcw size={16} />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-center border-b border-slate-600 bg-slate-800">
-                        <button
-                            className={`px-4 py-2 font-bold transition-colors ${
-                                activeTab === 'my-characters'
-                                    ? 'text-indigo-400 border-b-2 border-indigo-400'
-                                    : 'text-slate-400 hover:text-slate-200'
-                            }`}
-                            onClick={() => setActiveTab('my-characters')}
-                        >
-                            My Characters
-                        </button>
-                        <button
-                            className={`px-4 py-2 font-bold transition-colors ${
-                                activeTab === 'players'
-                                    ? 'text-indigo-400 border-b-2 border-indigo-400'
-                                    : 'text-slate-400 hover:text-slate-200'
-                            }`}
-                            onClick={() => setActiveTab('players')}
-                        >
-                            Players
-                        </button>
-                    </div>
-
-                    <div className="flex flex-1 overflow-hidden p-2 justify-center">
-                        {activeTab === 'my-characters' && (
-                            <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
-                                <div className="max-w-200 h-full flex flex-col no-scrollbar overflow-y-auto">
-                                    <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
-                                        <h2 className="text-base font-bold text-indigo-400">
-                                            My Characters
-                                        </h2>
-                                    </div>
-                                    <UploadCharacter
-                                        onUpload={(character: Hero | HeroLite) => {
-                                            addCharacter(character);
-                                        }}
-                                    />
-                                    <CharacterList
-                                        onCharacterClick={(character: HeroLite) =>
-                                            navigate(`/character/${character.id}`)
-                                        }
-                                        canDelete
-                                        canShare
-                                        characters={characters}
-                                    />
-                                    <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
-                                        <h2 className="text-base font-bold text-indigo-400">
-                                            Shared Characters
-                                        </h2>
-                                    </div>
-                                    <CharacterList
-                                        onCharacterClick={(character: HeroLite) =>
-                                            navigate(`/character/${character.id}`)
-                                        }
-                                        canDelete
-                                        canCopy
-                                        characters={roomCharacters}
+                <div className="flex flex-1 overflow-hidden">
+                    <main className="flex flex-col flex-1 overflow-hidden">
+                        <div className="flex justify-center p-2 items-center gap-2 flex-shrink-0">
+                            <div className="flex flex-row flex-grow justify-center gap-2">
+                                <div>
+                                    <CounterTracker
+                                        parentValue={malice}
+                                        label="Malice"
+                                        incrementHandler={incrementMalice}
+                                        decrementHandler={decrementMalice}
+                                        updateHandler={handleMaliceUpdate}
+                                        textColor="text-slate-100"
+                                        labelColor="text-slate-300"
+                                        buttonColor="text-slate-300"
                                     />
                                 </div>
+                                <button
+                                    onClick={() => setMalice(0)}
+                                    className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
+                                >
+                                    <RotateCcw size={16} />
+                                </button>
                             </div>
-                        )}
+                            <div className="flex flex-row flex-grow justify-center gap-2">
+                                <div>
+                                    <CounterTracker
+                                        parentValue={heroTokens}
+                                        label="Hero Tokens"
+                                        incrementHandler={incrementHeroTokens}
+                                        decrementHandler={decrementHeroTokens}
+                                        updateHandler={handleHeroTokenUpdate}
+                                        textColor="text-slate-100"
+                                        labelColor="text-slate-300"
+                                        buttonColor="text-slate-300"
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => updateHeroTokens(0)}
+                                    className="mt-5 bg-red-600/30 text-slate-100 px-3 py-2 rounded-full text-sm font-bold hover:bg-red-900 transition-colors"
+                                >
+                                    <RotateCcw size={16} />
+                                </button>
+                            </div>
+                        </div>
 
-                        {activeTab === 'players' && (
-                            <div className="w-full h-full flex flex-col md:flex-row gap-4 overflow-hidden">
-                                <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
-                                    <h2 className="text-md font-bold mb-1 text-center">Players</h2>
-                                    {players.length != 0 ? (
-                                        <ul>
-                                            {players.map((player) => (
-                                                <li
-                                                    key={player.id}
-                                                    className={`cursor-pointer p-2 m-1 rounded ${
-                                                        selectedPlayer?.id === player.id
-                                                            ? 'bg-slate-700'
-                                                            : 'hover:bg-slate-800'
-                                                    }`}
-                                                    onClick={() => setSelectedPlayer(player)}
-                                                >
-                                                    {player.name}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <div className="text-center text-slate-500 italic mt-4">
-                                            No players connected
+                        <div className="flex justify-center border-b border-slate-600 bg-slate-800">
+                            <button
+                                className={`px-4 py-2 font-bold transition-colors ${
+                                    activeTab === 'my-characters'
+                                        ? 'text-indigo-400 border-b-2 border-indigo-400'
+                                        : 'text-slate-400 hover:text-slate-200'
+                                }`}
+                                onClick={() => setActiveTab('my-characters')}
+                            >
+                                My Characters
+                            </button>
+                            <button
+                                className={`px-4 py-2 font-bold transition-colors ${
+                                    activeTab === 'players'
+                                        ? 'text-indigo-400 border-b-2 border-indigo-400'
+                                        : 'text-slate-400 hover:text-slate-200'
+                                }`}
+                                onClick={() => setActiveTab('players')}
+                            >
+                                Players
+                            </button>
+                        </div>
+
+                        <div className="flex flex-1 overflow-hidden p-2 justify-center">
+                            {activeTab === 'my-characters' && (
+                                <div className="bg-slate-800 rounded-lg shadow-xl flex flex-col border border-slate-700">
+                                    <div className="max-w-200 h-full flex flex-col no-scrollbar overflow-y-auto">
+                                        <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
+                                            <h2 className="text-base font-bold text-indigo-400">
+                                                My Characters
+                                            </h2>
                                         </div>
-                                    )}
+                                        <UploadCharacter
+                                            onUpload={(character: Hero | HeroLite) => {
+                                                addCharacter(character);
+                                            }}
+                                        />
+                                        <CharacterList
+                                            onCharacterClick={(character: HeroLite) =>
+                                                navigate(`/character/${character.id}`)
+                                            }
+                                            canDelete
+                                            canShare
+                                            characters={characters}
+                                        />
+                                        <div className="bg-slate-900 px-3 py-2 border-b border-slate-700 rounded-t-lg">
+                                            <h2 className="text-base font-bold text-indigo-400">
+                                                Shared Characters
+                                            </h2>
+                                        </div>
+                                        <CharacterList
+                                            onCharacterClick={(character: HeroLite) =>
+                                                navigate(`/character/${character.id}`)
+                                            }
+                                            canDelete
+                                            canCopy
+                                            characters={roomCharacters}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
+                            )}
+
+                            {activeTab === 'players' && (
+                                <div className="w-full h-full flex flex-col md:flex-row gap-4 overflow-hidden">
                                     <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
-                                        {selectedPlayer ? (
-                                            <>
-                                                <h2 className="text-md font-bold mb-1 text-center">
-                                                    {selectedPlayer.name}'s Characters
-                                                </h2>
-                                                {playerCharacters &&
-                                                playerCharacters[selectedPlayer.id] &&
-                                                playerCharacters[selectedPlayer.id].length > 0 ? (
-                                                    <CharacterList
-                                                        onCharacterClick={(character) =>
-                                                            navigate(`/character/${character.id}`)
-                                                        }
-                                                        characters={playerCharacters[
-                                                            selectedPlayer.id
-                                                        ].filter(
-                                                            (character) => character.tokenId != ''
-                                                        )}
-                                                    />
-                                                ) : (
-                                                    <div className="text-center text-slate-500 italic">
-                                                        No characters assigned
-                                                    </div>
-                                                )}
-                                            </>
+                                        <h2 className="text-md font-bold mb-1 text-center">
+                                            Players
+                                        </h2>
+                                        {players.length != 0 ? (
+                                            <ul>
+                                                {players.map((player) => (
+                                                    <li
+                                                        key={player.id}
+                                                        className={`cursor-pointer p-2 m-1 rounded ${
+                                                            selectedPlayer?.id === player.id
+                                                                ? 'bg-slate-700'
+                                                                : 'hover:bg-slate-800'
+                                                        }`}
+                                                        onClick={() => setSelectedPlayer(player)}
+                                                    >
+                                                        {player.name}
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         ) : (
-                                            <span>
-                                                <h2 className="text-md font-bold mb-1 text-center">
-                                                    Characters
-                                                </h2>
-                                                <div className="text-center text-slate-500 italic mt-4">
-                                                    Select a player to view their characters
-                                                </div>
-                                            </span>
+                                            <div className="text-center text-slate-500 italic mt-4">
+                                                No players connected
+                                            </div>
                                         )}
                                     </div>
+                                    <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
+                                        <div className="flex-1 flex flex-col overflow-y-auto md:border-r md:border-slate-700 md:pr-2">
+                                            {selectedPlayer ? (
+                                                <>
+                                                    <h2 className="text-md font-bold mb-1 text-center">
+                                                        {selectedPlayer.name}'s Characters
+                                                    </h2>
+                                                    {playerCharacters &&
+                                                    playerCharacters[selectedPlayer.id] &&
+                                                    playerCharacters[selectedPlayer.id].length >
+                                                        0 ? (
+                                                        <CharacterList
+                                                            onCharacterClick={(character) =>
+                                                                navigate(
+                                                                    `/character/${character.id}`
+                                                                )
+                                                            }
+                                                            characters={playerCharacters[
+                                                                selectedPlayer.id
+                                                            ].filter(
+                                                                (character) =>
+                                                                    character.tokenId != ''
+                                                            )}
+                                                        />
+                                                    ) : (
+                                                        <div className="text-center text-slate-500 italic">
+                                                            No characters assigned
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <span>
+                                                    <h2 className="text-md font-bold mb-1 text-center">
+                                                        Characters
+                                                    </h2>
+                                                    <div className="text-center text-slate-500 italic mt-4">
+                                                        Select a player to view their characters
+                                                    </div>
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                </main>
+                            )}
+                        </div>
+                    </main>
+                    {showCombatView && (
+                        <aside className="w-1/3 min-w-[300px] max-w-[450px] border-l border-slate-700 bg-slate-900 overflow-y-auto no-scrollbar">
+                            <GMCombatView />
+                        </aside>
+                    )}
+                </div>
             </div>
         </div>
     );

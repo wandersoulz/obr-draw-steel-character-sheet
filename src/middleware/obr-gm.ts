@@ -3,6 +3,7 @@ import OBR from '@owlbear-rodeo/sdk';
 import { METADATA_KEYS } from '@/constants';
 import { GmState } from '@/stores/gmStore';
 import { HeroLite } from '@/models/hero-lite';
+import { TokenData } from '@/models/token-data';
 
 export const obrGm =
     <T extends GmState>(f: StateCreator<T, [], []>): StateCreator<T, [], []> =>
@@ -74,11 +75,20 @@ export const obrGm =
                     const updates = Object.values(playerCharacters)
                         .flat()
                         .filter((c) => c.tokenId != '')
-                        .map((c) => ({ [c.tokenId]: c }))
+                        .map((c) => ({
+                            [c.tokenId]: {
+                                id: c.id,
+                                name: c.name,
+                                stamina: c.maxStamina - c.state.staminaDamage,
+                                maxStamina: c.maxStamina,
+                            } as TokenData,
+                        }))
                         .reduce(
-                            (prevVal: Record<string, HeroLite>, newVal: Record<string, HeroLite>) =>
-                                Object.assign(prevVal, newVal),
-                            {} as Record<string, HeroLite>
+                            (
+                                prevVal: Record<string, TokenData>,
+                                newVal: Record<string, TokenData>
+                            ) => Object.assign(prevVal, newVal),
+                            {} as Record<string, TokenData>
                         );
 
                     // @ts-ignore
@@ -93,7 +103,7 @@ export const obrGm =
                                 item.metadata[METADATA_KEYS.CHARACTER_DATA] = updates[item.id];
                             });
                         });
-                    }, 500);
+                    }, 150);
                 });
             },
             get,

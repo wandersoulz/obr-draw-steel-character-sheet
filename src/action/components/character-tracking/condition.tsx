@@ -11,11 +11,17 @@ interface ConditionProps {
 }
 
 export function Condition({ hero, name, updateHero, condition }: ConditionProps) {
-    const [selected, setSelected] = useState(false);
+    const [selected, setSelected] = useState(
+        hero.state.conditions.find((c) => c.id == condition.id) !== undefined
+    );
 
     useEffect(() => {
         const heroState = Object.assign({}, hero.state);
+
         if (selected) {
+            // If condition already exists, do nothing
+            if (hero.state.conditions.find((c) => c.id == condition.id)) return;
+
             // Add the condition
             heroState.conditions.push(condition);
             updateHero({ state: heroState });

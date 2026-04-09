@@ -14,7 +14,6 @@ export type RollAttributes = {
 
 export type Roll = {
     timeStamp: number;
-    playerName: string;
     bonus: number;
     hasSkill: boolean;
     netEdges: number;
@@ -29,17 +28,18 @@ export type DieResult = {
     dropped: boolean;
 };
 
-export type DiceRoller = {
+export type DiceRoller<T extends DiceProtocol.RollResult> = {
     connect: () => void;
     disconnect: () => void;
-    onRollResult: (rollResult: DiceProtocol.PowerRollResult) => void;
 } & (
     | {
           config: DiceProtocol.DiceRollerConfig;
-          requestRoll: (rollRequest: DiceProtocol.PowerRollRequest) => void;
+          requestRoll: <U extends DiceProtocol.RollRequestBase>(rollRequest: U) => Promise<T>;
+          requestPowerRoll: <U extends DiceProtocol.RollRequestBase>(rollRequest: U) => Promise<T>;
       }
     | {
           config: undefined;
           requestRoll: undefined;
+          requestPowerRoll: undefined;
       }
 );
