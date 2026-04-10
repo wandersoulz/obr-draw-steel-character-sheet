@@ -1,3 +1,3 @@
 export const FLAGS = {
-    RESET_CHARACTER: true,
-}
+    RESET_CHARACTER: false,
+};
