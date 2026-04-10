@@ -29,10 +29,10 @@ export function Recovery({
               : 'blue';
     }, [hero]);
     return (
-        <div className="bg-gray-50 border border-gray-200 rounded p-2">
-            <div className="flex items-center justify-between gap-3">
+        <div className="bg-gray-50 border border-gray-200 rounded p-2 flex flex-col gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <span className="text-xs font-bold text-gray-500 uppercase">Recoveries</span>
+                    <span className="text-sm font-bold text-gray-500 uppercase">Recoveries</span>
                     <p className="text-xs text-gray-500">+{recoveryValue} stamina</p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -44,7 +44,7 @@ export function Recovery({
                                     Math.min(maxRecoveries, hero.state.recoveriesUsed + 1)
                                 );
                             }}
-                            className={`h-7 w-5 pl-1 flex items-center justify-center hover:bg-${color}-100 transition-colors text-gray-700`}
+                            className={`h-8 w-8 flex items-center justify-center hover:bg-${color}-100 transition-colors flex-shrink-0 text-gray-700`}
                         >
                             <Minus size={14} strokeWidth={3.0} />
                         </button>
@@ -64,11 +64,11 @@ export function Recovery({
                                 }}
                                 clearContentOnFocus
                                 className={
-                                    'w-5 bg-transparent text-center text-sm font-bold text-gray-900 outline-none flex-shrink-0'
+                                    'w-8 h-8 bg-transparent text-center text-sm font-bold text-gray-900 outline-none flex-shrink-0'
                                 }
                             />
-                            <span className="text-gray-400 text-sm">/</span>
-                            <span className="px-2 text-center font-bold text-sm text-gray-900">
+                            <span className="text-gray-400 mx-0.5 text-sm">/</span>
+                            <span className="w-7 text-center font-bold text-sm text-gray-900">
                                 {maxRecoveries}
                             </span>
                         </div>
@@ -78,49 +78,50 @@ export function Recovery({
                                 if (hero.state.recoveriesUsed === 0) return;
                                 onValueChanged('recoveriesUsed')(hero.state.recoveriesUsed - 1);
                             }}
-                            className={`h-7 w-5 pr-1 flex items-center justify-center hover:bg-${color}-100 transition-colors flex-shrink-0 text-gray-700`}
+                            className={`h-8 w-8 flex items-center justify-center hover:bg-${color}-100 transition-colors flex-shrink-0 text-gray-700`}
                         >
                             <Plus size={14} strokeWidth={3.0} />
                         </button>
                     </InputBackground>
-                    <button
-                        onClick={() => {
-                            onValueChanged('recoveriesUsed')(0);
-                        }}
-                        disabled={hero.state.recoveriesUsed == 0}
-                        className={
-                            'w-7 h-7 flex items-center justify-center rounded bg-green-600 hover:bg-green-500 text-white disabled:bg-gray-300 disabled:cursor-not-allowed'
-                        }
-                    >
-                        <RotateCcw size={12} />
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (hero.state.staminaDamage == 0) {
-                                return;
-                            }
-                            onUpdate({
-                                state: {
-                                    ...hero.state,
-                                    staminaDamage: Math.max(
-                                        0,
-                                        hero.state.staminaDamage - recoveryValue
-                                    ),
-                                    recoveriesUsed: hero.state.recoveriesUsed + 1,
-                                },
-                            });
-                        }}
-                        disabled={hero.state.recoveriesUsed == maxRecoveries}
-                        className={`w-7 h-7 flex items-center justify-center rounded text-white ${
-                            hero.state.staminaDamage != 0 &&
-                            hero.state.recoveriesUsed != maxRecoveries
-                                ? 'bg-blue-600 hover:bg-blue-500'
-                                : 'bg-gray-300 cursor-not-allowed'
-                        }`}
-                    >
-                        <Heart size={12} />
-                    </button>
                 </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <button
+                    onClick={() => {
+                        onValueChanged('recoveriesUsed')(0);
+                    }}
+                    disabled={hero.state.recoveriesUsed == 0}
+                    className={
+                        'flex-1 h-8 flex items-center justify-center gap-1 rounded bg-green-600 hover:bg-green-500 transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed text-xs font-bold'
+                    }
+                >
+                    <RotateCcw size={14} /> Reset
+                </button>
+                <button
+                    onClick={() => {
+                        if (hero.state.staminaDamage == 0) {
+                            return;
+                        }
+                        onUpdate({
+                            state: {
+                                ...hero.state,
+                                staminaDamage: Math.max(
+                                    0,
+                                    hero.state.staminaDamage - recoveryValue
+                                ),
+                                recoveriesUsed: hero.state.recoveriesUsed + 1,
+                            },
+                        });
+                    }}
+                    disabled={hero.state.recoveriesUsed == maxRecoveries}
+                    className={`flex-1 h-8 flex items-center justify-center gap-1 rounded text-white transition-colors text-xs font-bold ${
+                        hero.state.staminaDamage != 0 && hero.state.recoveriesUsed != maxRecoveries
+                            ? 'bg-blue-600 hover:bg-blue-500'
+                            : 'bg-gray-300 cursor-not-allowed'
+                    }`}
+                >
+                    <Heart size={14} /> Recover
+                </button>
             </div>
         </div>
     );

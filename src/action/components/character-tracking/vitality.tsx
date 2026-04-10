@@ -24,14 +24,14 @@ export function Vitality({ hero, onUpdate, onValueChanged }: VitalityProps) {
     }, [hero]);
 
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
+        <div className="flex-1 w-full bg-white rounded-lg shadow-sm border border-gray-300 overflow-hidden">
             <div className="bg-indigo-900 text-white p-2">
                 <h2 className="text-sm font-bold">Health</h2>
             </div>
             <div className="p-2 space-y-2">
                 <div className="bg-gray-50 border border-gray-200 rounded p-2">
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-gray-500 uppercase">Stamina</span>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-sm font-bold text-gray-500 uppercase">Stamina</span>
                         <div className="flex items-center gap-1">
                             <InputBackground
                                 color={
@@ -56,7 +56,7 @@ export function Vitality({ hero, onUpdate, onValueChanged }: VitalityProps) {
                                             )
                                         );
                                     }}
-                                    className="h-8 w-8 flex items-center justify-center hover:bg-blue-200 transition-colors text-gray-700"
+                                    className="h-8 w-8 flex items-center justify-center hover:bg-blue-200 transition-colors flex-shrink-0 text-gray-700"
                                 >
                                     <Minus size={14} strokeWidth={3.0} />
                                 </button>

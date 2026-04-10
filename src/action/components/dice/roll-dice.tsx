@@ -19,7 +19,6 @@ import { ToggleGroup } from '@/components/common/toggle';
 import { useModalStore } from '@/stores/modalStore';
 import { useEffect, useMemo } from 'react';
 import * as DiceProtocol from '@/utils/dice-protocol';
-import OBR from '@owlbear-rodeo/sdk';
 
 interface DiceRollerProps {
     rollAttributes: RollAttributes;
@@ -248,15 +247,10 @@ export function DiceRollerView({
                     onClick={() => {
                         if (!canRoll) return;
                         setDiceResultViewerOpen(true);
-                        if (diceRoller.config === undefined) {
-                            OBR.notification.show(
-                                'Config for dice roller not loaded...',
-                                'WARNING'
-                            );
-                        } else {
+                        if (diceRoller.config !== undefined) {
                             setResult(undefined);
                             diceRoller
-                                .requestRoll(
+                                .requestPowerRoll(
                                     createPowerRollRequest({
                                         bonus: rollAttributes.bonus,
                                         netEdges,

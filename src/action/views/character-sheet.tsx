@@ -200,7 +200,11 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                         .reduce((prev, curr) => prev + curr, 0);
                     const startingInitiative = roll >= 6 ? 'heroes' : 'enemies';
                     startCombat(startingInitiative, numPlayers, numEnemyGroups);
-                    OBR.notification.show(startingInitiative == 'heroes' ? "Heroes act first!" : "Director has the first turn!");
+                    OBR.notification.show(
+                        startingInitiative == 'heroes'
+                            ? 'Heroes act first!'
+                            : 'Director has the first turn!'
+                    );
                 });
     };
 
@@ -234,11 +238,11 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
             <div className="w-full bg-slate-700 flex flex-col h-full overflow-hidden">
                 <div className="flex-shrink-0">
                     {/* Header */}
-                    <header className="bg-slate-900 shadow-lg border-b border-slate-700 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0 flex-shrink-0">
+                    <header className="bg-slate-900 shadow-lg border-b border-slate-700 px-4 py-2 flex flex-col md:flex-row items-center justify-between gap-1 md:gap-0 flex-shrink-0">
                         <div className="w-full md:w-auto flex justify-start">
                             <button
                                 onClick={() => navigate('/')}
-                                className="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-white transition-colors p-2 md:p-0 -ml-2 md:ml-0"
+                                className="flex items-center text-sm font-medium text-slate-400 hover:text-white transition-colors pl-2 pt-2 md:pl-0 md:pt-0 -ml-2 md:ml-0"
                             >
                                 <ArrowLeft size={16} />
                                 Back
@@ -261,20 +265,20 @@ export function CharacterSheet({ forgeSteelLoaded, playerRole }: CharacterSheetP
                             {initiative === 'no-combat' && (
                                 <button
                                     onClick={handleDrawSteel}
-                                    className="px-4 py-2 md:px-3 md:py-1 min-h-[44px] md:min-h-0 text-sm md:text-xs font-bold rounded-full bg-red-700 text-red-100 border border-red-600 hover:bg-red-600 hover:text-white transition-colors shadow-sm"
+                                    className="px-2 py-1 md:px-3 md:py-1 text-sm md:text-xs font-bold rounded-full bg-red-700 text-red-100 border border-red-600 hover:bg-red-600 hover:text-white transition-colors shadow-sm"
                                 >
                                     Draw Steel!
                                 </button>
                             )}
                             <button
                                 onClick={handleAddItem}
-                                className="px-4 py-2 md:px-3 md:py-1 min-h-[44px] md:min-h-0 text-sm md:text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
+                                className="px-2 py-1 md:px-3 md:py-1 text-sm md:text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
                             >
                                 Add Item
                             </button>
                             <button
                                 onClick={handleAddTitle}
-                                className="px-4 py-2 md:px-3 md:py-1 min-h-[44px] md:min-h-0 text-sm md:text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
+                                className="px-2 py-1 md:px-3 md:py-1 text-sm md:text-xs font-medium rounded-full bg-indigo-900 text-indigo-100 border border-indigo-700 hover:bg-indigo-800 hover:text-white transition-colors"
                             >
                                 Add Title
                             </button>

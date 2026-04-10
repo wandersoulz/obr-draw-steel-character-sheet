@@ -1,4 +1,3 @@
-import InputBackground from '@/components/common/InputBackground';
 import { Hero } from 'forgesteel';
 import { useMemo } from 'react';
 
@@ -16,9 +15,11 @@ export function Skills({ hero }: SkillsProps) {
             <div className="columns-1 md:columns-3 gap-2 p-2">
                 {skills.map((skill) => (
                     <div key={skill.name} className="break-inside-avoid mb-1 flex flex-shrink">
-                        <InputBackground color={'DEFAULT'}>
-                            <div className="p-1.5 text-sm text-gray-900">{skill.name}</div>
-                        </InputBackground>
+                        <div className="bg-indigo-100 border border-indigo-200 rounded flex items-center justify-center">
+                            <div className="p-1.5 text-sm font-bold text-gray-500">
+                                {skill.name}
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>

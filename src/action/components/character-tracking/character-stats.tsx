@@ -25,7 +25,7 @@ export function CharacterStats({ hero }: CharacteristicsProps) {
             <div className="p-2 grid grid-cols-5 gap-2 border-b border-indigo-600">
                 {Object.keys(Characteristic).map((characteristic) => (
                     <div key={characteristic} className="flex flex-col items-center">
-                        <span className="text-xs font-bold text-gray-500 mb-0.5">
+                        <span className="text-sm font-bold text-gray-500 mb-0.5">
                             {characteristic}
                         </span>
                         <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
@@ -45,31 +45,31 @@ export function CharacterStats({ hero }: CharacteristicsProps) {
             </div>
             <div className="p-2 grid grid-cols-5 gap-2 bg-gray-50">
                 <div className="flex flex-col items-center pr-1.5">
-                    <span className="text-xs font-bold text-gray-500 mb-0.5">Size</span>
+                    <span className="text-sm font-bold text-gray-500 mb-0.5">Size</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{size}</span>
                     </div>
                 </div>
                 <div className="flex flex-col items-center pr-1.5">
-                    <span className="text-xs font-bold text-gray-500 mb-0.5">Speed</span>
+                    <span className="text-sm font-bold text-gray-500 mb-0.5">Speed</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{speed}</span>
                     </div>
                 </div>
                 <div className="flex flex-col items-center pr-1.5">
-                    <span className="text-xs font-bold text-gray-500 mb-0.5">Stability</span>
+                    <span className="text-sm font-bold text-gray-500 mb-0.5">Stability</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{stability}</span>
                     </div>
                 </div>
                 <div className="flex flex-col items-center pr-1.5">
-                    <span className="text-xs font-bold text-gray-500 mb-0.5">Disengage</span>
+                    <span className="text-sm font-bold text-gray-500 mb-0.5">Disengage</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">{disengage}</span>
                     </div>
                 </div>
                 <div className="flex flex-col items-center">
-                    <span className="text-xs font-bold text-gray-500 mb-0.5">Save</span>
+                    <span className="text-sm font-bold text-gray-500 mb-0.5">Save</span>
                     <div className="bg-indigo-100 border border-indigo-200 rounded px-2 py-1 flex items-center justify-center">
                         <span className="text-md font-bold text-gray-900">6≤</span>
                     </div>

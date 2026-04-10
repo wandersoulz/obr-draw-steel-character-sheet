@@ -30,15 +30,15 @@ export function AbilityCardHeader({
                 </div>
 
                 <div className="flex-1 min-w-0 flex items-center gap-2">
-                    <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                    <h4 className="text-md font-bold text-slate-900 leading-tight">
                         {ability.name}
                     </h4>
                     {ability.cost > 0 && (
-                        <span className="text-[10px] uppercase font-black px-1.5 py-0.5 bg-white text-slate-700 rounded border border-slate-200 shadow-sm whitespace-nowrap">
+                        <span className="text-[11px] uppercase font-black px-1.5 py-0.5 bg-white text-slate-700 rounded border border-slate-200 shadow-sm whitespace-nowrap">
                             {ability.cost} {heroicResourceName}
                         </span>
                     )}
-                    <span className="hidden sm:inline-block text-[10px] text-slate-600 font-medium uppercase tracking-wider ml-1">
+                    <span className="hidden sm:inline-block text-[11px] text-slate-600 font-medium uppercase tracking-wider ml-1">
                         {ability.abilityType}
                     </span>
                 </div>
@@ -60,9 +60,7 @@ export function AbilityCardHeader({
                 </div>
                 {ability.keywords && (
                     <div className="ml-auto hidden sm:flex items-center gap-1">
-                        <span className="text-[10px] text-slate-800 max-w-[120px]">
-                            {ability.keywords}
-                        </span>
+                        <span className="text-slate-800">{ability.keywords}</span>
                     </div>
                 )}
             </div>

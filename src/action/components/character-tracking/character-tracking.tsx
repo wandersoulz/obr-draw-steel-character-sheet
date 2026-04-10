@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { Trackers } from './trackers';
 import { CharacterStats } from './character-stats';
 import { Vitality } from './vitality';
-import { Conditions } from './conditions';
 import { Skills } from './skills';
 
 interface SheetHeaderProps {
@@ -45,9 +44,6 @@ export function CharacterTracking({ hero, onUpdate }: SheetHeaderProps) {
             </div>
             <div className="flex sm:flex-row flex-col gap-2">
                 <CharacterStats hero={hero} />
-                <Conditions hero={hero} onUpdate={onUpdate} />
-            </div>
-            <div className="flex">
                 <Skills hero={hero} />
             </div>
         </div>

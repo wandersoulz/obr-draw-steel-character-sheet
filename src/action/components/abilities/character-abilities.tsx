@@ -7,13 +7,24 @@ import {
     Characteristic,
 } from 'forgesteel';
 import { AbilitySection } from './ability-section';
-import { Activity, Crown, Eye, EyeOff, Flame, Footprints, Heart, Swords, Zap } from 'lucide-react';
+import {
+    Activity,
+    Crown,
+    Eye,
+    EyeOff,
+    Flame,
+    Footprints,
+    Shield,
+    Heart,
+    Swords,
+    Zap,
+} from 'lucide-react';
 import { useState } from 'react';
 import { AbilityData } from 'forgesteel/data';
 
 const SECTION_THEME = {
     'Main Action': { color: '#2563eb', icon: Swords }, // blue-600
-    Maneuvers: { color: '#059669', icon: Footprints }, // emerald-600
+    Maneuvers: { color: '#059669', icon: Shield }, // emerald-600
     'Free Strikes': { color: '#441950ff', icon: Flame }, // slate-500
     'Triggered Actions': { color: '#d97706', icon: Activity }, // amber-600
     Move: { color: '#059669', icon: Footprints }, // emerald-600
